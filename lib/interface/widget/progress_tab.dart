@@ -6,23 +6,22 @@ class ProgressTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return const /* Scaffold(
       floatingActionButton: FloatingButtonSmallComponent(),
-    );
+    ); */
 
-    /* Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            FloatingButtonLargeComponent(),
-            
-            SizedBox(
-              height: 16,
-            ),
-            Text("Iniciar Teste de Germinação"),
-          ],
-        ),
-      ); */
+        Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          FloatingButtonLargeComponent(),
+          SizedBox(
+            height: 16,
+          ),
+          Text("Iniciar Teste de Germinação"),
+        ],
+      ),
+    );
   }
 }

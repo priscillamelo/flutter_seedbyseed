@@ -1,0 +1,4 @@
+enum TypeGermination {
+  normal,
+  anormal,
+}
