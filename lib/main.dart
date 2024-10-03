@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/page/add_germination_test.dart';
+import 'package:flutter_seedbyseed/interface/page/add_repetition_germination_test.dart';
 import 'package:flutter_seedbyseed/interface/widget/completed_tab.dart';
 import 'package:flutter_seedbyseed/interface/widget/progress_tab.dart';
 import 'package:flutter_seedbyseed/route/routes.dart';
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter SeedBySeed',
+      title: 'Seed By Seed',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
@@ -23,6 +24,8 @@ class MyApp extends StatelessWidget {
         PageRoutes.kHOME: (context) => const HomePage(),
         PageRoutes.kADD_GERMINATIONTEST: (context) =>
             const AddGerminationTest(),
+        PageRoutes.kADD_REPETITIONGERMINATIONTEST: (context) =>
+            const AddRepetitionGerminationTest(),
         //PageRoutes.kUPDATE_GERMINATIONTEST: (context) => const UpdateGerminationTest(),
       },
       home: const HomePage(),
@@ -51,7 +54,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
       // TODO: CRIAR UM COMPONENT PARA APPBAR
       appBar: AppBar(
-        title: const Text("SeedBySeed"),
+        title: const Text("Seed By Seed"),
         bottom: TabBar(controller: _tabController, tabs: const [
           Tab(
             text: "Em Andamento",
