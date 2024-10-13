@@ -4,25 +4,21 @@ class TextFormFieldComponent extends StatelessWidget {
   final String textLabel;
   final TextEditingController controller;
   final TextInputType textInputType;
+  final String? suffixText;
 
   const TextFormFieldComponent(
       {super.key,
       required this.textLabel,
       required this.controller,
-      required this.textInputType});
+      required this.textInputType,
+      required this.suffixText});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       keyboardType: textInputType,
-      maxLength: textLabel == "Lote" ? 1 : null,
-      decoration: InputDecoration(
-        labelText: textLabel,
-        suffixText: textLabel == "Duração" ? "dias" : null,
-        suffix: textLabel == "Lote"
-            ? IconButton(onPressed: () {}, icon: Icon(Icons.add_circle_rounded))
-            : null,
-      ),
+      //maxLength: textLabel == "Lote" ? 1 : null,
+      decoration: InputDecoration(labelText: textLabel, suffixText: suffixText),
       validator: _validatorField,
     );
   }

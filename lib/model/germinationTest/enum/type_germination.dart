@@ -1,4 +1,0 @@
-enum TypeGermination {
-  normal,
-  anormal,
-}

@@ -1,10 +1,12 @@
-import 'package:flutter_seedbyseed/model/germinationTest/enum/material.dart';
+import 'package:flutter_seedbyseed/model/germinationTest/enum/material_enum.dart';
+import 'package:flutter_seedbyseed/model/germinationTest/enum/substrate_enum.dart';
 
 class GerminationTest {
   final String especie;
   //final Responsavel _responsavel;
   final List<int> lote;
-  final Material materialUtilizado;
+  final MaterialEnum materialUtilizado;
+  final SubstrateEnum substratoUtilizado;
   final double temperatura;
   final DateTime duracao;
   final int primeiraContage;
@@ -13,7 +15,7 @@ class GerminationTest {
       repeticao; // TALVEZ SEJA NECESSARIO QUE O TIPO SEJA UM MAP, PARA CADA REPETICAO (INT) TERA SUA QUANTIDADE DE SEMENTES GERMINADAS (INT)
   final int totalSementes;
 
-  GerminationTest(
+  GerminationTest(this.substratoUtilizado,
       {required this.especie,
       required this.lote,
       required this.materialUtilizado,

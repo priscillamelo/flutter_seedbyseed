@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/page/add_germination_test.dart';
-import 'package:flutter_seedbyseed/interface/page/add_repetition_germination_test.dart';
 import 'package:flutter_seedbyseed/interface/widget/completed_tab.dart';
 import 'package:flutter_seedbyseed/interface/widget/progress_tab.dart';
 import 'package:flutter_seedbyseed/route/routes.dart';
@@ -24,8 +23,7 @@ class MyApp extends StatelessWidget {
         PageRoutes.kHOME: (context) => const HomePage(),
         PageRoutes.kADD_GERMINATIONTEST: (context) =>
             const AddGerminationTest(),
-        PageRoutes.kADD_REPETITIONGERMINATIONTEST: (context) =>
-            const AddRepetitionGerminationTest(),
+
         //PageRoutes.kUPDATE_GERMINATIONTEST: (context) => const UpdateGerminationTest(),
       },
       home: const HomePage(),
