@@ -1,26 +1,25 @@
-import 'package:flutter_seedbyseed/model/germinationTest/enum/material_enum.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/enum/substrate_enum.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_const.dart';
 
 class GerminationTest {
-  int id = 0;
+  late int id;
   late String species;
   //late Responsavel _responsible;
-  late List<int> lot;
-  late MaterialEnum materialUsed;
-  late SubstrateEnum substratoUsed;
-  late double temperature;
-  late DateTime duration;
+  late int lot;
+  late String materialUsed;
+  late String substratoUsed;
+  late String temperature;
+  late int duration;
   late int firstCount;
   late int lastCount;
-  late List<int>
+  late int
       repetition; // TALVEZ SEJA NECESSARIO QUE O TIPO SEJA UM MAP, PARA CADA REPETICAO (INT) TERA SUA QUANTIDADE DE SEMENTES GERMINADAS (INT)
   late int totalSeeds;
 
-  GerminationTest(this.substratoUsed,
+  GerminationTest(
       {required this.species,
       required this.lot,
       required this.materialUsed,
+      required this.substratoUsed,
       required this.temperature,
       required this.duration,
       required this.firstCount,
@@ -44,7 +43,6 @@ class GerminationTest {
 
   Map<String, dynamic> toMap() {
     return {
-      GerminationTestConst.kIDGERMINATIONTESTCOLUMN: id,
       GerminationTestConst.kSPECIESCOLUMN: species,
       GerminationTestConst.kLOTCOLUMN: lot,
       GerminationTestConst.kMATERIALCOLUMN: materialUsed,

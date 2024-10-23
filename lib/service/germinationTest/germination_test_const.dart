@@ -1,17 +1,17 @@
 class GerminationTestConst {
-  static const String kGERMINATIONTESTTABLE = 'germination-test-table';
-  static const String kIDGERMINATIONTESTCOLUMN = 'id-column-germination-test';
-  static const String kSPECIESCOLUMN = 'species-column-germination-test';
-  static const String kLOTCOLUMN = 'lot-column-germination-test';
-  static const String kMATERIALCOLUMN = 'material-column-germination-test';
-  static const String kSUBSTRATECOLUMN = 'substrate-column-germination-test';
+  static const String kGERMINATIONTESTTABLE = 'germination_test_table';
+  static const String kIDGERMINATIONTESTCOLUMN = 'id_column_germination_test';
+  static const String kSPECIESCOLUMN = 'species_column_germination_test';
+  static const String kLOTCOLUMN = 'lot_column_germination_test';
+  static const String kMATERIALCOLUMN = 'material_column_germination_test';
+  static const String kSUBSTRATECOLUMN = 'substrate_column_germination_test';
   static const String kTEMPERATURECOLUMN =
-      'temperature-column-germination-test';
-  static const String kDURATIONCOLUMN = 'duation-column-germination-test';
-  static const String kFIRSTCOUNTCOLUMN = 'first-count-column-germination-test';
-  static const String kLASTCOUNTCOLUMN = 'last-count-column-germination-test';
-  static const String kREPETITIONCOLUMN = 'repetition-column-germination-test';
-  static const String kTOTALSEEDSCOLUMN = 'total-seeds-column-germination-test';
+      'temperature_column_germination_test';
+  static const String kDURATIONCOLUMN = 'duation_column_germination_test';
+  static const String kFIRSTCOUNTCOLUMN = 'first_count_column_germination_test';
+  static const String kLASTCOUNTCOLUMN = 'last_count_column_germination_test';
+  static const String kREPETITIONCOLUMN = 'repetition_column_germination_test';
+  static const String kTOTALSEEDSCOLUMN = 'total_seeds_column_germination_test';
   static const String kRESPONSIBLECOLUMN =
-      'responsible-column-germination-test';
+      'responsible_column_germination_test';
 }

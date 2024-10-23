@@ -16,8 +16,8 @@ class TextFormFieldComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: controller,
       keyboardType: textInputType,
-      //maxLength: textLabel == "Lote" ? 1 : null,
       decoration: InputDecoration(labelText: textLabel, suffixText: suffixText),
       validator: _validatorField,
     );

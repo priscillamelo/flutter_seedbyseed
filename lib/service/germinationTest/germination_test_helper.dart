@@ -17,10 +17,9 @@ class GerminationTestHelper {
     return numberRowsAffected;
   }
 
-  Future<List<GerminationTest>> getAllGerminationTest() async {
+  Future<List> getAllGerminationTest() async {
     final Database database = await _databaseApp.getDatabase;
-    final List<GerminationTest> listGerminationTest =
-        (await database.query(tableName)).cast<GerminationTest>();
+    final List listGerminationTest = await database.query(tableName);
 
     return listGerminationTest;
   }

@@ -1,35 +1,21 @@
 import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/germination_test_const.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_helper.dart';
 
 class GerminationTestRepository {
-  String get sqlTable => """
-CREATE TABLE ${GerminationTestConst.kGERMINATIONTESTTABLE} (
-  ${GerminationTestConst.kIDGERMINATIONTESTCOLUMN} INTEGER PRIMARY KEY AUTOINCREMENT,
-  ${GerminationTestConst.kSPECIESCOLUMN} TEXT NOT NULL,
-  ${GerminationTestConst.kLOTCOLUMN} INTEGER NOT NULL,
-  ${GerminationTestConst.kMATERIALCOLUMN} TEXT NOT NULL,
-  ${GerminationTestConst.kSUBSTRATECOLUMN} TEXT NOT NULL,
-  ${GerminationTestConst.kTEMPERATURECOLUMN} TEXT NUMERIC NOT NULL,
-  ${GerminationTestConst.kDURATIONCOLUMN} INTEGER NOT NULL,
-  ${GerminationTestConst.kFIRSTCOUNTCOLUMN} INTEGER NOT NULL,
-  ${GerminationTestConst.kLASTCOUNTCOLUMN} INTEGER NOT NULL,
-  ${GerminationTestConst.kREPETITIONCOLUMN} INTEGER NOT NULL,
-  ${GerminationTestConst.kTOTALSEEDSCOLUMN} INTEGER NOT NULL
-);
-""";
+  GerminationTestHelper helper = GerminationTestHelper();
 
-  GerminationTestRepository() {
-    _initRepository();
+  GerminationTestRepository();
+
+  Future<void> initialize() async {
+    await _initRepository();
   }
-  final GerminationTestHelper _helper = GerminationTestHelper();
 
   _initRepository() async {
     await getAllGerminationTest();
   }
 
   Future<List<GerminationTest>> getAllGerminationTest() async {
-    List mapGerminationTest = await _helper.getAllGerminationTest();
+    List mapGerminationTest = await helper.getAllGerminationTest();
     List<GerminationTest> allGerminationTest = [];
 
     for (Map g in mapGerminationTest) {
@@ -41,28 +27,28 @@ CREATE TABLE ${GerminationTestConst.kGERMINATIONTESTTABLE} (
 
   Future<int> addGerminationTest(GerminationTest germinationTest) async {
     int numberRowsAffected;
-    numberRowsAffected = await _helper.addGerminationTest(germinationTest);
+    numberRowsAffected = await helper.addGerminationTest(germinationTest);
 
     return numberRowsAffected;
   }
 
   Future<GerminationTest?> getGerminationTest(int id) async {
     final GerminationTest? germinationTest;
-    germinationTest = await _helper.getGerminationTest(id);
+    germinationTest = await helper.getGerminationTest(id);
 
     return germinationTest;
   }
 
   Future<int> updateGerminationTest(GerminationTest germinationTest) async {
     int numberRowsAffected;
-    numberRowsAffected = await _helper.updateGerminationTest(germinationTest);
+    numberRowsAffected = await helper.updateGerminationTest(germinationTest);
 
     return numberRowsAffected;
   }
 
   Future<int> deleteGerminationTest(int id) async {
     int numberRowsAffected;
-    numberRowsAffected = await _helper.deleteGerminationTest(id);
+    numberRowsAffected = await helper.deleteGerminationTest(id);
 
     return numberRowsAffected;
   }
