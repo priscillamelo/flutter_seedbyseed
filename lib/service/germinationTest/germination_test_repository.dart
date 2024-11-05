@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_helper.dart';
 
-class GerminationTestRepository {
+class GerminationTestRepository extends ChangeNotifier {
   GerminationTestHelper helper = GerminationTestHelper();
 
   GerminationTestRepository();
@@ -29,6 +30,7 @@ class GerminationTestRepository {
     int numberRowsAffected;
     numberRowsAffected = await helper.addGerminationTest(germinationTest);
 
+    notifyListeners();
     return numberRowsAffected;
   }
 
@@ -43,6 +45,7 @@ class GerminationTestRepository {
     int numberRowsAffected;
     numberRowsAffected = await helper.updateGerminationTest(germinationTest);
 
+    notifyListeners();
     return numberRowsAffected;
   }
 
@@ -50,6 +53,7 @@ class GerminationTestRepository {
     int numberRowsAffected;
     numberRowsAffected = await helper.deleteGerminationTest(id);
 
+    notifyListeners();
     return numberRowsAffected;
   }
 }

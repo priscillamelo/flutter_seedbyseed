@@ -3,9 +3,20 @@ import 'package:flutter_seedbyseed/interface/page/add_germination_test.dart';
 import 'package:flutter_seedbyseed/interface/widget/completed_tab.dart';
 import 'package:flutter_seedbyseed/interface/widget/progress_tab.dart';
 import 'package:flutter_seedbyseed/route/routes.dart';
+import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => GerminationTestRepository(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
