@@ -19,7 +19,7 @@ class DatabaseApp {
     );
     final Database database = await openDatabase(
       databasePath,
-      version: 1,
+      version: 2,
       onCreate: (database, newerVersion) async {
         await database.execute(_sqlTableGerminationTest);
       },
@@ -38,14 +38,14 @@ class DatabaseApp {
 CREATE TABLE ${GerminationTestConst.kGERMINATIONTESTTABLE} (
   ${GerminationTestConst.kIDGERMINATIONTESTCOLUMN} INTEGER PRIMARY KEY AUTOINCREMENT,
   ${GerminationTestConst.kSPECIESCOLUMN} TEXT NOT NULL,
-  ${GerminationTestConst.kLOTCOLUMN} INTEGER NOT NULL,
+  ${GerminationTestConst.kLOTCOLUMN} TEXT NOT NULL,
   ${GerminationTestConst.kMATERIALCOLUMN} TEXT NOT NULL,
   ${GerminationTestConst.kSUBSTRATECOLUMN} TEXT NOT NULL,
   ${GerminationTestConst.kTEMPERATURECOLUMN} TEXT NOT NULL,
   ${GerminationTestConst.kDURATIONCOLUMN} INTEGER NOT NULL,
   ${GerminationTestConst.kFIRSTCOUNTCOLUMN} INTEGER NOT NULL,
   ${GerminationTestConst.kLASTCOUNTCOLUMN} INTEGER NOT NULL,
-  ${GerminationTestConst.kREPETITIONCOLUMN} INTEGER NOT NULL,
+  ${GerminationTestConst.kREPETITIONCOLUMN} TEXT NOT NULL,
   ${GerminationTestConst.kTOTALSEEDSCOLUMN} INTEGER NOT NULL
 );
 """;

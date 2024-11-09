@@ -166,11 +166,22 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                           ElevatedButton(
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
+                                Map<int, int> repetitionMap = {
+                                  for (int i = 1;
+                                      i <= int.parse(_repeticaoController.text);
+                                      i++)
+                                    i: 0
+                                };
+                                Map<int, int> lotMap = {
+                                  for (int i = 1;
+                                      i <= int.parse(_loteController.text);
+                                      i++)
+                                    i: 0
+                                };
                                 GerminationTest germinationTest =
                                     GerminationTest(
                                         species: _especieController.text,
-                                        lot: int.parse(
-                                            _loteController.value.text),
+                                        lot: lotMap,
                                         materialUsed: materialUsed,
                                         substratoUsed: substrateUsed,
                                         temperature:
@@ -181,8 +192,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                             _contagemInicialController.text),
                                         lastCount: int.parse(
                                             _contagemFinalController.text),
-                                        repetition: int.parse(
-                                            _repeticaoController.text),
+                                        repetition: repetitionMap,
                                         totalSeeds: int.parse(
                                             _sementesRepeticaoController.text));
 

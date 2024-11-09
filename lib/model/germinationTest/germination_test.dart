@@ -1,18 +1,19 @@
+import 'dart:convert';
+
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_const.dart';
 
 class GerminationTest {
   late int id;
   late String species;
   //late Responsavel _responsible;
-  late int lot;
+  late Map<int, int> lot;
   late String materialUsed;
   late String substratoUsed;
   late String temperature;
   late int duration;
   late int firstCount;
   late int lastCount;
-  late int
-      repetition; // TALVEZ SEJA NECESSARIO QUE O TIPO SEJA UM MAP, PARA CADA REPETICAO (INT) TERA SUA QUANTIDADE DE SEMENTES GERMINADAS (INT)
+  late Map<int, int> repetition;
   late int totalSeeds;
 
   GerminationTest(
@@ -30,28 +31,29 @@ class GerminationTest {
   GerminationTest.fromMap(Map map) {
     id = map[GerminationTestConst.kIDGERMINATIONTESTCOLUMN];
     species = map[GerminationTestConst.kSPECIESCOLUMN];
-    lot = map[GerminationTestConst.kLOTCOLUMN];
+    lot = Map<int, int>.from(jsonDecode(map[GerminationTestConst.kLOTCOLUMN]));
     materialUsed = map[GerminationTestConst.kMATERIALCOLUMN];
     substratoUsed = map[GerminationTestConst.kSUBSTRATECOLUMN];
     temperature = map[GerminationTestConst.kTEMPERATURECOLUMN];
     duration = map[GerminationTestConst.kDURATIONCOLUMN];
     firstCount = map[GerminationTestConst.kFIRSTCOUNTCOLUMN];
     lastCount = map[GerminationTestConst.kLASTCOUNTCOLUMN];
-    repetition = map[GerminationTestConst.kREPETITIONCOLUMN];
+    repetition = Map<int, int>.from(
+        jsonDecode(map[GerminationTestConst.kREPETITIONCOLUMN]));
     totalSeeds = map[GerminationTestConst.kTOTALSEEDSCOLUMN];
   }
 
   Map<String, dynamic> toMap() {
     return {
       GerminationTestConst.kSPECIESCOLUMN: species,
-      GerminationTestConst.kLOTCOLUMN: lot,
+      GerminationTestConst.kLOTCOLUMN: jsonEncode(lot),
       GerminationTestConst.kMATERIALCOLUMN: materialUsed,
       GerminationTestConst.kSUBSTRATECOLUMN: substratoUsed,
       GerminationTestConst.kTEMPERATURECOLUMN: temperature,
       GerminationTestConst.kDURATIONCOLUMN: duration,
       GerminationTestConst.kFIRSTCOUNTCOLUMN: firstCount,
       GerminationTestConst.kLASTCOUNTCOLUMN: lastCount,
-      GerminationTestConst.kREPETITIONCOLUMN: repetition,
+      GerminationTestConst.kREPETITIONCOLUMN: jsonEncode(repetition),
       GerminationTestConst.kTOTALSEEDSCOLUMN: totalSeeds
     };
   }
