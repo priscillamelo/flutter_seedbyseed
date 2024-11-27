@@ -4,7 +4,7 @@ class TextFormFieldComponent extends StatelessWidget {
   final String textLabel;
   final TextEditingController controller;
   final TextInputType textInputType;
-  final String? suffixText;
+  final String suffixText;
 
   const TextFormFieldComponent(
       {super.key,

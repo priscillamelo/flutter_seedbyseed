@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/page/add_germinated_seeds.dart';
 import 'package:flutter_seedbyseed/interface/page/add_germination_test.dart';
@@ -6,8 +8,13 @@ import 'package:flutter_seedbyseed/interface/widget/progress_tab.dart';
 import 'package:flutter_seedbyseed/route/routes.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
   runApp(
     MultiProvider(
       providers: [
@@ -66,7 +73,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Scaffold(
       // TODO: CRIAR UM COMPONENT PARA APPBAR
       appBar: AppBar(
-        title: const Text("Seed By Seed"),
+        centerTitle: true,
+        toolbarHeight: 50,
+        title: Image.asset(
+          "assets/images/logo_seedbyseed.png",
+          height: 50,
+          width: 50,
+          semanticLabel: "Logo Seed by Seed",
+        ),
         bottom: TabBar(controller: _tabController, tabs: const [
           Tab(
             text: "Em Andamento",

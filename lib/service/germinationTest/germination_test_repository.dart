@@ -15,6 +15,13 @@ class GerminationTestRepository extends ChangeNotifier {
     await getAllGerminationTest();
   }
 
+  Future<int> addGerminationTest(GerminationTest germinationTest) async {
+    int idGerminationTest = await helper.insertGerminationTest(germinationTest);
+
+    notifyListeners();
+    return idGerminationTest;
+  }
+
   Future<List<GerminationTest>> getAllGerminationTest() async {
     List mapGerminationTest = await helper.getAllGerminationTest();
     List<GerminationTest> allGerminationTest = [];
@@ -24,14 +31,6 @@ class GerminationTestRepository extends ChangeNotifier {
     }
 
     return allGerminationTest;
-  }
-
-  Future<int> addGerminationTest(GerminationTest germinationTest) async {
-    int numberRowsAffected;
-    numberRowsAffected = await helper.addGerminationTest(germinationTest);
-
-    notifyListeners();
-    return numberRowsAffected;
   }
 
   Future<GerminationTest?> getGerminationTest(int id) async {

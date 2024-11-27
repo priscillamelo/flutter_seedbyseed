@@ -76,7 +76,7 @@ class _DropdownButtonComponentState extends State<DropdownButtonComponent> {
                         : 'Digite o substrato',
                     controller: otherMaterial,
                     textInputType: TextInputType.text,
-                    suffixText: null),
+                    suffixText: ""),
               )
             : Container(),
       ],

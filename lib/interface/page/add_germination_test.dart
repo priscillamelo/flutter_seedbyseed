@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/widget/component/dropdown_button_component.dart';
 import 'package:flutter_seedbyseed/interface/widget/component/text_form_field_component.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
+import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
 import 'package:provider/provider.dart';
 
@@ -61,7 +62,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                       controller: _especieController,
                       textLabel: "Espécie",
                       textInputType: TextInputType.text,
-                      suffixText: null,
+                      suffixText: "",
                     ),
                     /* TextFormFieldComponent(
                     controller: _responsavelController,
@@ -79,7 +80,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                       controller: _loteController,
                       textLabel: "Lote",
                       textInputType: TextInputType.number,
-                      suffixText: null,
+                      suffixText: "",
                     ),
                     TextFormFieldComponent(
                       controller: _repeticaoController,
@@ -112,7 +113,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                               controller: _contagemInicialController,
                               textLabel: "Contagem Inicial",
                               textInputType: TextInputType.number,
-                              suffixText: null,
+                              suffixText: "",
                             ),
                           ),
                         ),
@@ -123,7 +124,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                               controller: _contagemFinalController,
                               textLabel: "Contagem Final",
                               textInputType: TextInputType.number,
-                              suffixText: null,
+                              suffixText: "",
                             ),
                           ),
                         ),
@@ -164,24 +165,11 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                             ),
                           ),
                           ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
                               if (_formKey.currentState!.validate()) {
-                                Map<int, int> repetitionMap = {
-                                  for (int i = 1;
-                                      i <= int.parse(_repeticaoController.text);
-                                      i++)
-                                    i: 0
-                                };
-                                Map<int, int> lotMap = {
-                                  for (int i = 1;
-                                      i <= int.parse(_loteController.text);
-                                      i++)
-                                    i: 0
-                                };
                                 GerminationTest germinationTest =
                                     GerminationTest(
                                         species: _especieController.text,
-                                        lot: lotMap,
                                         materialUsed: materialUsed,
                                         substratoUsed: substrateUsed,
                                         temperature:
@@ -192,18 +180,28 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                             _contagemInicialController.text),
                                         lastCount: int.parse(
                                             _contagemFinalController.text),
-                                        repetition: repetitionMap,
                                         totalSeeds: int.parse(
                                             _sementesRepeticaoController.text));
 
-                                testRepository
+                                Future<int> idFuture = testRepository
                                     .addGerminationTest(germinationTest);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                          '${germinationTest.species} cadastrado!')),
-                                );
-                                Navigator.pop(context);
+                                int idGerminationTest = await idFuture;
+                                List<Lot> listLot = List<Lot>.generate(
+                                    int.parse(_loteController.text), (index) {
+                                  return Lot(
+                                      idGerminationTest: idGerminationTest,
+                                      numberLot: index);
+                                });
+
+                                debugPrint("${listLot.first.numberLot}");
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            '${germinationTest.species} cadastrado!')),
+                                  );
+                                  Navigator.pop(context);
+                                }
                               }
                             },
                             child: const Text(

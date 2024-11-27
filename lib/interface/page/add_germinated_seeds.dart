@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_seedbyseed/interface/widget/component/text_form_field_component.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
 
 class AddGerminatedSeeds extends StatefulWidget {
@@ -25,11 +24,11 @@ class _AddSeedGerminationState extends State<AddGerminatedSeeds> {
   Widget build(BuildContext context) {
     final arg = ModalRoute.of(context)!.settings.arguments as GerminationTest;
 
-    germinatedSeedsControllers = arg.repetition.keys.map((key) {
+    /* germinatedSeedsControllers = arg.repetition.keys.map((key) {
       return TextEditingController(text: key.toString());
-    }).toList();
+    }).toList(); */
 
-    debugPrint(arg.repetition.toString());
+    // debugPrint(arg.repetition.toString());
 
     return Scaffold(
         appBar: AppBar(
@@ -42,7 +41,7 @@ class _AddSeedGerminationState extends State<AddGerminatedSeeds> {
             children: [
               const Text("Informe a quantidade de sementes germinadas"),
               Text(arg.species),
-              Expanded(
+              /*  Expanded(
                 child: ListView.builder(
                     itemCount: arg.repetition.keys.length,
                     itemBuilder: (context, index) {
@@ -56,7 +55,7 @@ class _AddSeedGerminationState extends State<AddGerminatedSeeds> {
                             suffixText: "sementes germinadas"),
                       );
                     }),
-              ),
+              ), */
               ElevatedButton(
                 onPressed: () {
                   /* List<int> germinatedSeeds = [];

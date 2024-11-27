@@ -16,6 +16,7 @@ class _ProgressTabState extends State<ProgressTab> {
   Widget build(BuildContext context) {
     GerminationTestRepository testRepository =
         Provider.of<GerminationTestRepository>(context);
+    debugPrint(testRepository.getAllGerminationTest().toString());
     return Scaffold(
       body: FutureBuilder(
           future: testRepository.getAllGerminationTest(),

@@ -7,21 +7,14 @@ class GerminationTestHelper {
   final DatabaseApp _databaseApp = DatabaseApp.instanceDatabaseApp;
   final String tableName = GerminationTestConst.kGERMINATIONTESTTABLE;
 
-  Future<int> addGerminationTest(GerminationTest germinationTest) async {
+  Future<int> insertGerminationTest(GerminationTest germinationTest) async {
     final Database database = await _databaseApp.getDatabase;
-    final Future<int> numberRowsAffected;
 
-    numberRowsAffected = database.insert(tableName, germinationTest.toMap(),
+    int idGerminationTest = await database.insert(
+        tableName, germinationTest.toMap(),
         conflictAlgorithm: ConflictAlgorithm.abort);
 
-    return numberRowsAffected;
-  }
-
-  Future<List> getAllGerminationTest() async {
-    final Database database = await _databaseApp.getDatabase;
-    final List listGerminationTest = await database.query(tableName);
-
-    return listGerminationTest;
+    return idGerminationTest;
   }
 
   Future<GerminationTest?> getGerminationTest(int id) async {
@@ -34,6 +27,13 @@ class GerminationTestHelper {
         .cast<GerminationTest?>();
 
     return listGerminationTest.first;
+  }
+
+  Future<List> getAllGerminationTest() async {
+    final Database database = await _databaseApp.getDatabase;
+    final List listGerminationTest = await database.query(tableName);
+
+    return listGerminationTest;
   }
 
   Future<int> updateGerminationTest(GerminationTest germinationTest) async {
