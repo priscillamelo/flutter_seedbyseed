@@ -10,7 +10,6 @@ class GerminationTest {
   late int duration;
   late int firstCount;
   late int lastCount;
-
   late int totalSeeds;
 
   GerminationTest(

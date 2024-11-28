@@ -9,16 +9,16 @@ class AddGerminatedSeeds extends StatefulWidget {
 }
 
 class _AddSeedGerminationState extends State<AddGerminatedSeeds> {
-  late List<TextEditingController> germinatedSeedsControllers;
+  //late List<TextEditingController> germinatedSeedsControllers;
 
-  @override
+  /*  @override
   void dispose() {
     // Limpa os controladores ao encerrar a página
     for (var controller in germinatedSeedsControllers) {
       controller.dispose();
     }
     super.dispose();
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
@@ -36,37 +36,39 @@ class _AddSeedGerminationState extends State<AddGerminatedSeeds> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Informe a quantidade de sementes germinadas"),
-              Text(arg.species),
-              /*  Expanded(
-                child: ListView.builder(
-                    itemCount: arg.repetition.keys.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0, vertical: 16.0),
-                        child: TextFormFieldComponent(
-                            textLabel: 'Repetição ${index + 1}',
-                            controller: germinatedSeedsControllers[index],
-                            textInputType: TextInputType.number,
-                            suffixText: "sementes germinadas"),
-                      );
-                    }),
-              ), */
-              ElevatedButton(
-                onPressed: () {
-                  /* List<int> germinatedSeeds = [];
-                  for (var controller in germinatedSeedsControllers) {
-                    germinatedSeeds.add(int.parse(controller.text));
-                    debugPrint(controller.text);
-                  } */
-                },
-                child: const Text("Atualizar dados"),
-              ),
-            ],
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text("Informe a quantidade de sementes germinadas"),
+                Text(arg.species),
+                /*  Expanded(
+                  child: ListView.builder(
+                      itemCount: arg.repetition.keys.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 16.0),
+                          child: TextFormFieldComponent(
+                              textLabel: 'Repetição ${index + 1}',
+                              controller: germinatedSeedsControllers[index],
+                              textInputType: TextInputType.number,
+                              suffixText: "sementes germinadas"),
+                        );
+                      }),
+                ), */
+                ElevatedButton(
+                  onPressed: () {
+                    /* List<int> germinatedSeeds = [];
+                    for (var controller in germinatedSeedsControllers) {
+                      germinatedSeeds.add(int.parse(controller.text));
+                      debugPrint(controller.text);
+                    } */
+                  },
+                  child: const Text("Atualizar dados"),
+                ),
+              ],
+            ),
           ),
         ));
   }

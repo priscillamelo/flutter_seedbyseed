@@ -1,4 +1,5 @@
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_const.dart';
+import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_const.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -64,11 +65,11 @@ CREATE TABLE ${GerminationTestConst.kGERMINATIONTESTTABLE} (
 """;
 
   final String _sqlTableLot = """
-CREATE TABLE lot_table (
-  id_lot INTEGER PRIMARY KEY AUTOINCREMENT,
-  number_lot INTEGER NOT NULL,
-  id_germination_test_lot INTEGER NOT NULL,
-  FOREIGN KEY (id_germination_test_lot) REFERENCES germination_test_table (id_germination_test) ON DELETE CASCADE
+CREATE TABLE ${LotConst.kLOTTABLE} (
+  ${LotConst.kIDLOTCOLUMN} INTEGER PRIMARY KEY AUTOINCREMENT,
+  ${LotConst.kNUMBERLOTCOLUMN} INTEGER NOT NULL,
+  ${LotConst.kIDGERMINATIONTESTFOREIGNKEY} INTEGER NOT NULL,
+  FOREIGN KEY (${LotConst.kIDGERMINATIONTESTFOREIGNKEY}) REFERENCES germination_test_table (${GerminationTestConst.kIDGERMINATIONTESTCOLUMN}) ON DELETE CASCADE
 );
 """;
 

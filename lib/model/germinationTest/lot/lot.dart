@@ -9,7 +9,6 @@ class Lot {
 
   Map<String, dynamic> toMap() {
     return {
-      LotConst.kIDLOTCOLUMN: id,
       LotConst.kNUMBERLOTCOLUMN: numberLot,
       LotConst.kIDGERMINATIONTESTFOREIGNKEY: idGerminationTest,
     };

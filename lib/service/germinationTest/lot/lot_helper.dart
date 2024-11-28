@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_seedbyseed/database/database_app.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_const.dart';
@@ -7,13 +8,20 @@ class LotHelper {
   final DatabaseApp _databaseApp = DatabaseApp.instanceDatabaseApp;
   final String tableName = LotConst.kLOTTABLE;
 
-  Future<int> insertLot(Lot lot) async {
+  Future<int?> insertLot(Lot lot) async {
     final Database database = await _databaseApp.getDatabase;
 
-    int idLot = await database.insert(tableName, lot.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.replace);
-
-    return idLot;
+    try {
+      int idLot = await database.insert(
+        tableName,
+        lot.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.abort,
+      );
+      return idLot;
+    } catch (e) {
+      debugPrint("Erro ao adicionar o lot no banco");
+    }
+    return null;
   }
 
   Future<List<Lot>> getAllLots(int idGerminationTest) async {

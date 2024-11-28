@@ -3,7 +3,9 @@ import 'package:flutter_seedbyseed/interface/widget/component/dropdown_button_co
 import 'package:flutter_seedbyseed/interface/widget/component/text_form_field_component.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
+import 'package:flutter_seedbyseed/model/germinationTest/repetition/repetition.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
+import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
 import 'package:provider/provider.dart';
 
 class AddGerminationTest extends StatelessWidget {
@@ -29,23 +31,27 @@ class FormAddWidget extends StatefulWidget {
 
 class _FormCustomWidgetState extends State<FormAddWidget> {
   late GerminationTestRepository testRepository;
+  late LotRepository lotRepository;
   final _formKey = GlobalKey<FormState>();
 
   final _especieController = TextEditingController();
   //final _responsavelController = TextEditingController();
   final _duracaoController = TextEditingController(text: '0');
-  final _loteController = TextEditingController(text: '0');
-  final _repeticaoController = TextEditingController(text: '0');
+  final _loteController = TextEditingController();
+  final _repeticaoController = TextEditingController();
   final _sementesRepeticaoController = TextEditingController(text: '0');
   final _temperaturaController = TextEditingController(text: '0');
   final _contagemInicialController = TextEditingController(text: '0');
   final _contagemFinalController = TextEditingController(text: '0');
   late String materialUsed = "";
   late String substrateUsed = "";
+  late List<Lot> listLot;
+  late List<Repetition> listRepetition;
 
   @override
   Widget build(BuildContext context) {
     testRepository = Provider.of<GerminationTestRepository>(context);
+    lotRepository = LotRepository();
 
     return SafeArea(
       child: Center(
@@ -181,19 +187,49 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                         lastCount: int.parse(
                                             _contagemFinalController.text),
                                         totalSeeds: int.parse(
-                                            _sementesRepeticaoController.text));
+                                                _repeticaoController.text) *
+                                            int.parse(
+                                                _sementesRepeticaoController
+                                                    .text));
 
                                 Future<int> idFuture = testRepository
                                     .addGerminationTest(germinationTest);
                                 int idGerminationTest = await idFuture;
-                                List<Lot> listLot = List<Lot>.generate(
+
+                                //debugPrint(idGerminationTest.toString());
+
+                                listLot = List<Lot>.generate(
                                     int.parse(_loteController.text), (index) {
                                   return Lot(
                                       idGerminationTest: idGerminationTest,
-                                      numberLot: index);
+                                      numberLot: index + 1);
                                 });
 
-                                debugPrint("${listLot.first.numberLot}");
+                                List<int> listIdLot = [];
+
+                                for (var lot in listLot) {
+                                  idFuture = lotRepository.addLot(lot);
+                                  int id = await idFuture;
+
+                                  listIdLot = List.filled(
+                                      int.parse(_repeticaoController.text), id);
+                                }
+
+                                listRepetition = List<Repetition>.generate(
+                                  int.parse(_repeticaoController.text),
+                                  (index) {
+                                    var lotId = listIdLot[index];
+                                    debugPrint("ID: ${lotId.toString()}");
+                                    return Repetition(
+                                        lotId: lotId,
+                                        seedsTotal: int.parse(
+                                            _sementesRepeticaoController.text),
+                                        germinatedSeeds: 0);
+                                  },
+                                );
+
+                                debugPrint(listRepetition.toString());
+
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(

@@ -11,8 +11,10 @@ class GerminationTestHelper {
     final Database database = await _databaseApp.getDatabase;
 
     int idGerminationTest = await database.insert(
-        tableName, germinationTest.toMap(),
-        conflictAlgorithm: ConflictAlgorithm.abort);
+      tableName,
+      germinationTest.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.abort,
+    );
 
     return idGerminationTest;
   }

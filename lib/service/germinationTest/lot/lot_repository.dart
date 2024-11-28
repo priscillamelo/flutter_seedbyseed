@@ -7,9 +7,9 @@ class LotRepository {
   LotRepository();
 
   Future<int> addLot(Lot lot) async {
-    int idLot = await helper.insertLot(lot);
+    int? idLot = await helper.insertLot(lot);
 
-    return idLot;
+    return idLot ?? 0;
   }
 
   Future<List<Lot>> getAllLots(int idGerminationTest) async {

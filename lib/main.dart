@@ -74,12 +74,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       // TODO: CRIAR UM COMPONENT PARA APPBAR
       appBar: AppBar(
         centerTitle: true,
-        toolbarHeight: 50,
-        title: Image.asset(
-          "assets/images/logo_seedbyseed.png",
-          height: 50,
-          width: 50,
-          semanticLabel: "Logo Seed by Seed",
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              "assets/images/logo1.png",
+              width: 60,
+            ),
+            Image.asset(
+              "assets/images/seed_logo.png",
+              width: 30,
+            ),
+            Image.asset(
+              "assets/images/logo2.png",
+              width: 60,
+            ),
+          ],
         ),
         bottom: TabBar(controller: _tabController, tabs: const [
           Tab(
