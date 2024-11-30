@@ -74,22 +74,38 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       // TODO: CRIAR UM COMPONENT PARA APPBAR
       appBar: AppBar(
         centerTitle: true,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              "assets/images/logo1.png",
-              width: 60,
-            ),
-            Image.asset(
-              "assets/images/seed_logo.png",
-              width: 30,
-            ),
-            Image.asset(
-              "assets/images/logo2.png",
-              width: 60,
-            ),
-          ],
+        title: RichText(
+          text: const TextSpan(
+            children: [
+              TextSpan(
+                text: 'Seed',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Quicksand',
+                  color: Color.fromARGB(255, 64, 104, 25),
+                ),
+              ),
+              TextSpan(
+                text: ' By ',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Quicksand',
+                  color: Color.fromARGB(255, 94, 55, 31),
+                ),
+              ),
+              TextSpan(
+                text: 'Seed',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Quicksand',
+                  color: Color.fromARGB(255, 34, 167, 195),
+                ),
+              ),
+            ],
+          ),
         ),
         bottom: TabBar(controller: _tabController, tabs: const [
           Tab(

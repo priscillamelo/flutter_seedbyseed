@@ -6,6 +6,7 @@ import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/repetition/repetition.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
+import 'package:flutter_seedbyseed/service/germinationTest/repetition/repetition_repository.dart';
 import 'package:provider/provider.dart';
 
 class AddGerminationTest extends StatelessWidget {
@@ -32,6 +33,7 @@ class FormAddWidget extends StatefulWidget {
 class _FormCustomWidgetState extends State<FormAddWidget> {
   late GerminationTestRepository testRepository;
   late LotRepository lotRepository;
+  late RepetitionRepository repetitionRepository;
   final _formKey = GlobalKey<FormState>();
 
   final _especieController = TextEditingController();
@@ -46,12 +48,12 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
   late String materialUsed = "";
   late String substrateUsed = "";
   late List<Lot> listLot;
-  late List<Repetition> listRepetition;
 
   @override
   Widget build(BuildContext context) {
     testRepository = Provider.of<GerminationTestRepository>(context);
     lotRepository = LotRepository();
+    repetitionRepository = RepetitionRepository();
 
     return SafeArea(
       child: Center(
@@ -210,33 +212,37 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                 for (var lot in listLot) {
                                   idFuture = lotRepository.addLot(lot);
                                   int id = await idFuture;
-
-                                  listIdLot = List.filled(
-                                      int.parse(_repeticaoController.text), id);
+                                  listIdLot.add(id);
                                 }
 
-                                listRepetition = List<Repetition>.generate(
-                                  int.parse(_repeticaoController.text),
-                                  (index) {
-                                    var lotId = listIdLot[index];
-                                    debugPrint("ID: ${lotId.toString()}");
-                                    return Repetition(
-                                        lotId: lotId,
+                                int repetitionCount =
+                                    int.parse(_repeticaoController.text);
+
+                                for (int i = 0; i < listIdLot.length; i++) {
+                                  for (int j = 0; j < repetitionCount; j++) {
+                                    Repetition repetition = Repetition(
+                                        lotId: listIdLot[i],
                                         seedsTotal: int.parse(
                                             _sementesRepeticaoController.text),
                                         germinatedSeeds: 0);
-                                  },
-                                );
+                                    idFuture = repetitionRepository
+                                        .addRepetition(repetition);
+                                    int id = await idFuture;
 
-                                debugPrint(listRepetition.toString());
+                                    debugPrint(
+                                        "ID da repetição: ${id.toString()}");
+                                    debugPrint(
+                                        "ID do lote: ${listIdLot[i].toString()}");
+                                  }
 
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            '${germinationTest.species} cadastrado!')),
-                                  );
-                                  Navigator.pop(context);
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(
+                                              '${germinationTest.species} cadastrado!')),
+                                    );
+                                    Navigator.pop(context);
+                                  }
                                 }
                               }
                             },

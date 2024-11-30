@@ -13,7 +13,6 @@ class Repetition {
 
   Map<String, dynamic> toMap() {
     return {
-      RepetitionConst.kIDREPETITIONCOLUMN: id,
       RepetitionConst.kSEEDSTOTALCOLUMN: seedsTotal,
       RepetitionConst.kGERMINATEDSEEDSCOLUMN: germinatedSeeds,
       RepetitionConst.kIDLOTFOREIGNKEYREPETITION: lotId,

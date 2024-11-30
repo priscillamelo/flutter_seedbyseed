@@ -1,5 +1,6 @@
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_const.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_const.dart';
+import 'package:flutter_seedbyseed/service/germinationTest/repetition/repetition_const.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -74,12 +75,12 @@ CREATE TABLE ${LotConst.kLOTTABLE} (
 """;
 
   final String _sqlTableRepetition = """
-CREATE TABLE repetition_table (
-  id_repetition INTEGER PRIMARY KEY AUTOINCREMENT,
-  seeds_total_repetition INTEGER NOT NULL,
-  germinated_seeds_repetition INTEGER NOT NULL,
-  id_lot_repetition INTEGER NOT NULL,
-  FOREIGN KEY (id_lot_repetition) REFERENCES lot_table (id_lot) ON DELETE CASCADE
+CREATE TABLE ${RepetitionConst.kREPETITIONTABLE} (
+  ${RepetitionConst.kIDREPETITIONCOLUMN} INTEGER PRIMARY KEY AUTOINCREMENT,
+  ${RepetitionConst.kSEEDSTOTALCOLUMN} INTEGER NOT NULL,
+  ${RepetitionConst.kGERMINATEDSEEDSCOLUMN} INTEGER NOT NULL,
+  ${RepetitionConst.kIDLOTFOREIGNKEYREPETITION} INTEGER NOT NULL,
+  FOREIGN KEY (${RepetitionConst.kIDLOTFOREIGNKEYREPETITION}) REFERENCES ${LotConst.kLOTTABLE} (${LotConst.kIDLOTCOLUMN}) ON DELETE CASCADE
 );
 """;
 
