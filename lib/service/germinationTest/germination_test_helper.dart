@@ -44,7 +44,7 @@ class GerminationTestHelper {
 
     numberRowsAffected = await database.update(
         tableName, germinationTest.toMap(),
-        where: '${germinationTest.id} = ?',
+        where: '${GerminationTestConst.kIDGERMINATIONTESTCOLUMN} = ?',
         whereArgs: [germinationTest.id],
         conflictAlgorithm: ConflictAlgorithm.replace);
 
@@ -57,7 +57,7 @@ class GerminationTestHelper {
 
     numberRowsAffected = await database.delete(
       tableName,
-      where: '$id = ?',
+      where: '${GerminationTestConst.kIDGERMINATIONTESTCOLUMN} = ?',
       whereArgs: [id],
     );
 

@@ -21,4 +21,8 @@ class RepetitionRepository {
 
     return allRepetition;
   }
+
+  Future<void> updateRepetition(Repetition repetition) async {
+    await helper.updateRepetition(repetition);
+  }
 }

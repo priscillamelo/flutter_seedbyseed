@@ -38,19 +38,6 @@ class DatabaseApp {
     return await _initDatabase();
   }
 
-  /* final String _sqlTableGerminationTest = """
-CREATE TABLE germination_test_table (
-  id_germination_test INTEGER PRIMARY KEY AUTOINCREMENT,
-  specie_germination_test TEXT NOT NULL,
-  material_germination_test TEXT NOT NULL,
-  substrate_germination_test TEXT NOT NULL,
-  temperature_germination_test TEXT NOT NULL,
-  duration_germination_test INTEGER NOT NULL,
-  first_count_germination_test INTEGER NOT NULL,
-  last_count_germination_test INTEGER NOT NULL,
-  total_seeds_germination_test INTEGER NOT NULL
-);
-"""; */
   final String _sqlTableGerminationTest = """
 CREATE TABLE ${GerminationTestConst.kGERMINATIONTESTTABLE} (
   ${GerminationTestConst.kIDGERMINATIONTESTCOLUMN} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,7 +45,6 @@ CREATE TABLE ${GerminationTestConst.kGERMINATIONTESTTABLE} (
   ${GerminationTestConst.kMATERIALCOLUMN} TEXT NOT NULL,
   ${GerminationTestConst.kSUBSTRATECOLUMN} TEXT NOT NULL,
   ${GerminationTestConst.kTEMPERATURECOLUMN} TEXT NOT NULL,
-  ${GerminationTestConst.kDURATIONCOLUMN} INTEGER NOT NULL,
   ${GerminationTestConst.kFIRSTCOUNTCOLUMN} INTEGER NOT NULL,
   ${GerminationTestConst.kLASTCOUNTCOLUMN} INTEGER NOT NULL,
   ${GerminationTestConst.kTOTALSEEDSCOLUMN} INTEGER NOT NULL
@@ -83,22 +69,4 @@ CREATE TABLE ${RepetitionConst.kREPETITIONTABLE} (
   FOREIGN KEY (${RepetitionConst.kIDLOTFOREIGNKEYREPETITION}) REFERENCES ${LotConst.kLOTTABLE} (${LotConst.kIDLOTCOLUMN}) ON DELETE CASCADE
 );
 """;
-
-  /* final String _sqlTableLot = """
-CREATE TABLE ${LotConst.kLOTTABLE} (
-  ${LotConst.kIDLOTCOLUMN} INTEGER PRIMARY KEY AUTOINCREMENT,
-  ${LotConst.kNUMBERLOTCOLUMN} INTEGER NOT NULL,
-  ${LotConst.kIDGERMINATIONTESTFOREIGNKEY} INTEGER NOT NULL,
-  FOREIGN KEY (${LotConst.kIDGERMINATIONTESTFOREIGNKEY}) REFERENCES ${GerminationTestConst.kGERMINATIONTESTTABLE} (${GerminationTestConst.kIDGERMINATIONTESTCOLUMN}) ON DELETE CASCADE
-);
-"""; */
-  /* final String _sqlTableRepetition = """
-CREATE TABLE ${RepetitionConst.kREPETITIONTABLE} (
-  ${RepetitionConst.kIDREPETITIONCOLUMN} INTEGER PRIMARY KEY AUTOINCREMENT,
-  ${RepetitionConst.kSEEDSTOTALCOLUMN} INTEGER NOT NULL,
-  ${RepetitionConst.kGERMINATEDSEEDSCOLUMN} INTEGER NOT NULL,
-  ${RepetitionConst.kIDLOTFOREIGNKEYREPETITION} INTEGER NOT NULL,
-  FOREIGN KEY (${RepetitionConst.kIDLOTFOREIGNKEYREPETITION}) REFERENCES ${LotConst.kLOTTABLE} (${LotConst.kIDLOTCOLUMN}) ON DELETE CASCADE
-);
-"""; */
 }

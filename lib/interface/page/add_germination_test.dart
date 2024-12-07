@@ -7,6 +7,7 @@ import 'package:flutter_seedbyseed/model/germinationTest/repetition/repetition.d
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/repetition/repetition_repository.dart';
+import 'package:flutter_seedbyseed/service/notification/notification_service.dart';
 import 'package:provider/provider.dart';
 
 class AddGerminationTest extends StatelessWidget {
@@ -38,10 +39,10 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
 
   final _especieController = TextEditingController();
   //final _responsavelController = TextEditingController();
-  final _duracaoController = TextEditingController(text: '0');
+  //final _duracaoController = TextEditingController(text: '0');
   final _loteController = TextEditingController();
   final _repeticaoController = TextEditingController();
-  final _sementesRepeticaoController = TextEditingController(text: '0');
+  final _sementesRepeticaoController = TextEditingController();
   final _temperaturaController = TextEditingController(text: '0');
   final _contagemInicialController = TextEditingController(text: '0');
   final _contagemFinalController = TextEditingController(text: '0');
@@ -78,12 +79,12 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                     textInputType: TextInputType.text,
                     suffixText: null,
                   ), */
-                    TextFormFieldComponent(
+                    /* TextFormFieldComponent(
                       controller: _duracaoController,
                       textLabel: "Duração",
                       textInputType: TextInputType.number,
                       suffixText: "Dias",
-                    ),
+                    ), */
                     TextFormFieldComponent(
                       controller: _loteController,
                       textLabel: "Lote",
@@ -154,7 +155,6 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                       selectedMaterialOrSubstrate: (substrate) {
                         setState(() {
                           substrateUsed = substrate;
-                          //debugPrint(substrateUsed);
                         });
                       },
                     ),
@@ -182,8 +182,6 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                         substratoUsed: substrateUsed,
                                         temperature:
                                             _temperaturaController.text,
-                                        duration:
-                                            int.parse(_duracaoController.text),
                                         firstCount: int.parse(
                                             _contagemInicialController.text),
                                         lastCount: int.parse(
@@ -225,24 +223,20 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                         seedsTotal: int.parse(
                                             _sementesRepeticaoController.text),
                                         germinatedSeeds: 0);
-                                    idFuture = repetitionRepository
+                                    repetitionRepository
                                         .addRepetition(repetition);
-                                    int id = await idFuture;
-
-                                    debugPrint(
-                                        "ID da repetição: ${id.toString()}");
-                                    debugPrint(
-                                        "ID do lote: ${listIdLot[i].toString()}");
                                   }
+                                }
 
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              '${germinationTest.species} cadastrado!')),
-                                    );
-                                    Navigator.pop(context);
-                                  }
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            '${germinationTest.species} cadastrado!')),
+                                  );
+                                  debugPrint(
+                                      "TELA DE CADASTRO: ${_contagemInicialController.text}");
+                                  Navigator.pop(context);
                                 }
                               }
                             },

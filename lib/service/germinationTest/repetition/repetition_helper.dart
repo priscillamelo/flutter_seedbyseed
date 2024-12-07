@@ -17,15 +17,22 @@ class RepetitionHelper {
     return numberRowsAffected;
   }
 
-  Future<List<Repetition>> getAllRepetitions(int idLot) async {
+  Future<List> getAllRepetitions(int idLot) async {
     final Database database = await _databaseApp.getDatabase;
-    final List<Map<String, dynamic>> listMapRepetition = (await database.query(
-        tableName,
+    final List listRepetition = (await database.query(tableName,
         where: '${RepetitionConst.kIDLOTFOREIGNKEYREPETITION} = ?',
         whereArgs: [idLot]));
 
-    return List.generate(listMapRepetition.length, (index) {
-      return Repetition.fromMap(listMapRepetition[index]);
-    });
+    return listRepetition;
+  }
+
+  Future<void> updateRepetition(Repetition repetition) async {
+    final Database database = await _databaseApp.getDatabase;
+    await database.update(
+      tableName,
+      repetition.toMap(),
+      where: '${RepetitionConst.kIDREPETITIONCOLUMN} = ?',
+      whereArgs: [repetition.id],
+    );
   }
 }
