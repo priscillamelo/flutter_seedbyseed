@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/widget/component/floating_button_component.dart';
+import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
 import 'package:flutter_seedbyseed/route/routes.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
@@ -14,12 +15,16 @@ class ProgressTab extends StatefulWidget {
 }
 
 class _ProgressTabState extends State<ProgressTab> {
-  LotRepository lotRepository = LotRepository();
+  late LotRepository lotRepository;
+  late List<Lot> listLot;
   RepetitionRepository repetitionRepository = RepetitionRepository();
+  List<int> listGerminatedSeeds = [];
+
   @override
   Widget build(BuildContext context) {
     GerminationTestRepository testRepository =
         Provider.of<GerminationTestRepository>(context);
+    lotRepository = Provider.of<LotRepository>(context);
     return Scaffold(
       body: FutureBuilder(
           future: testRepository.getAllGerminationTest(),
@@ -71,9 +76,11 @@ class _ProgressTabState extends State<ProgressTab> {
                           },
                           child: ListTile(
                             title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(data[index].species),
-                                //Text(data[index].species),
+                                Text(
+                                    "Sementes Germinadas: ${data[index].germinatedSeeds}"),
                               ],
                             ),
                             trailing: Column(

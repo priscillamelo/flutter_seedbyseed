@@ -7,7 +7,6 @@ import 'package:flutter_seedbyseed/model/germinationTest/repetition/repetition.d
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/repetition/repetition_repository.dart';
-import 'package:flutter_seedbyseed/service/notification/notification_service.dart';
 import 'package:provider/provider.dart';
 
 class AddGerminationTest extends StatelessWidget {
@@ -186,11 +185,13 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                             _contagemInicialController.text),
                                         lastCount: int.parse(
                                             _contagemFinalController.text),
-                                        totalSeeds: int.parse(
-                                                _repeticaoController.text) *
+                                        totalSeeds:
                                             int.parse(
-                                                _sementesRepeticaoController
-                                                    .text));
+                                                    _repeticaoController.text) *
+                                                int.parse(
+                                                    _sementesRepeticaoController
+                                                        .text),
+                                        germinatedSeeds: 0);
 
                                 Future<int> idFuture = testRepository
                                     .addGerminationTest(germinationTest);
@@ -202,7 +203,8 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                     int.parse(_loteController.text), (index) {
                                   return Lot(
                                       idGerminationTest: idGerminationTest,
-                                      numberLot: index + 1);
+                                      numberLot: index + 1,
+                                      germinatedSeedPerLot: 0);
                                 });
 
                                 List<int> listIdLot = [];

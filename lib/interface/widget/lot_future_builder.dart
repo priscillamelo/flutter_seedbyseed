@@ -16,9 +16,9 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
     with TickerProviderStateMixin {
   late LotRepository lotRepository;
   late Future<List<Lot>> listLot;
-
   late PageController _pageViewController;
   int _currentPageIndex = 0;
+  bool lastPage = false;
 
   @override
   void initState() {
@@ -89,12 +89,19 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
                       onPageChanged: (index) {
                         setState(() {
                           _currentPageIndex = index; // Atualiza o lote atual
+                          //print(lastPage);
+                          lastPage =
+                              _currentPageIndex == snapshot.data!.length - 1;
+                          print(lastPage);
                         });
                       },
                       itemBuilder: (context, index) {
                         return Center(
                           child: RepetitionFutureBuilder(
-                              idLot: snapshot.data![index].id),
+                            idLot: snapshot.data![index].id,
+                            idGerminationTest: widget.idGerminationTest,
+                            lastPage: lastPage,
+                          ),
                         );
                       }),
                 ),

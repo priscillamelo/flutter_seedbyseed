@@ -7,20 +7,26 @@ import 'package:flutter_seedbyseed/interface/widget/completed_tab.dart';
 import 'package:flutter_seedbyseed/interface/widget/progress_tab.dart';
 import 'package:flutter_seedbyseed/route/routes.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
+import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
           create: (_) => GerminationTestRepository(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => LotRepository(),
+        )
       ],
       child: const MyApp(),
     ),

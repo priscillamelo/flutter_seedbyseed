@@ -19,16 +19,14 @@ class GerminationTestHelper {
     return idGerminationTest;
   }
 
-  Future<GerminationTest?> getGerminationTest(int id) async {
+  Future<List> getGerminationTest(int id) async {
     final Database database = await _databaseApp.getDatabase;
-    final List<GerminationTest?> listGerminationTest = (await database.query(
-            tableName,
-            limit: 1,
-            where: '${GerminationTestConst.kIDGERMINATIONTESTCOLUMN} = ?',
-            whereArgs: [id]))
-        .cast<GerminationTest?>();
+    final List listGerminationTest = await database.query(tableName,
+        limit: 1,
+        where: '${GerminationTestConst.kIDGERMINATIONTESTCOLUMN} = ?',
+        whereArgs: [id]);
 
-    return listGerminationTest.first;
+    return listGerminationTest;
   }
 
   Future<List> getAllGerminationTest() async {

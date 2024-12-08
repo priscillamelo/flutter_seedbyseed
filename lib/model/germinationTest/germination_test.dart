@@ -10,7 +10,7 @@ class GerminationTest {
   late int firstCount;
   late int lastCount;
   late int totalSeeds;
-  Map<int, int> dailyCount = {};
+  late int germinatedSeeds;
 
   GerminationTest(
       {required this.species,
@@ -19,7 +19,8 @@ class GerminationTest {
       required this.temperature,
       required this.firstCount,
       required this.lastCount,
-      required this.totalSeeds});
+      required this.totalSeeds,
+      required this.germinatedSeeds});
 
   Map<String, dynamic> toMap() {
     return {
@@ -29,7 +30,8 @@ class GerminationTest {
       GerminationTestConst.kTEMPERATURECOLUMN: temperature,
       GerminationTestConst.kFIRSTCOUNTCOLUMN: firstCount,
       GerminationTestConst.kLASTCOUNTCOLUMN: lastCount,
-      GerminationTestConst.kTOTALSEEDSCOLUMN: totalSeeds
+      GerminationTestConst.kTOTALSEEDSCOLUMN: totalSeeds,
+      GerminationTestConst.kGERMINATEDSEEDSCOLUMN: germinatedSeeds
     };
   }
 
@@ -42,7 +44,24 @@ class GerminationTest {
     firstCount = map[GerminationTestConst.kFIRSTCOUNTCOLUMN];
     lastCount = map[GerminationTestConst.kLASTCOUNTCOLUMN];
     totalSeeds = map[GerminationTestConst.kTOTALSEEDSCOLUMN];
+    germinatedSeeds = map[GerminationTestConst.kGERMINATEDSEEDSCOLUMN];
   }
+
+  /* Future<void> totalGerminatedSeed(int idGerminationTest) async {
+    // List<int> listTotalGerminationSeeds = [];
+    LotRepository lotRepository = LotRepository();
+    List<Lot> listLot = await lotRepository.getAllLots(idGerminationTest);
+
+    for (var lot in listLot) {
+      //print("ID DO LOT ENVIADO: ${lot.id}");
+      totalGerminatedSeeds += lot.germinatedSeedPerLot;
+
+      /* if (totalGerminationSeeds != 0) {
+        //listTotalGerminationSeeds.add(totalGerminationSeeds);
+        // print("listTotalGerminationSeeds = $listTotalGerminationSeeds");
+      } */
+    }
+  } */
 
   totalUngerminatedSeed() {}
 

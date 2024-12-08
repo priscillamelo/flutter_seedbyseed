@@ -33,15 +33,26 @@ class LotHelper {
     return listMapLots;
   }
 
-  /* Future<Lot> getLot(int idGerminationTest, int numberLot) async {
+  Future<List> getLot(int idGerminationTest, int idLot) async {
     final Database database = await _databaseApp.getDatabase;
-    final List<Map<String, dynamic>> listMapLots = (await database.query(
-        tableName,
-        where: '${LotConst.kIDGERMINATIONTESTFOREIGNKEY} = ?',
-        whereArgs: [idGerminationTest]));
+    final List listLot = await database.query(
+      tableName,
+      limit: 1,
+      where:
+          '${LotConst.kIDGERMINATIONTESTFOREIGNKEY} = ? AND ${LotConst.kIDLOTCOLUMN} = ?',
+      whereArgs: [idGerminationTest, idLot],
+    );
 
-    return List.generate(listMapLots.length, (index) {
-      return Lot.fromMap(listMapLots[index]);
-    });
-  } */
+    return listLot;
+  }
+
+  Future<void> updateLot(Lot lot) async {
+    final Database database = await _databaseApp.getDatabase;
+    await database.update(
+      tableName,
+      lot.toMap(),
+      where: '${LotConst.kIDLOTCOLUMN} = ?',
+      whereArgs: [lot.id],
+    );
+  }
 }
