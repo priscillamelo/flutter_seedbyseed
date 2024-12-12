@@ -36,10 +36,8 @@ class GerminationTestRepository extends ChangeNotifier {
   Future<GerminationTest> getGerminationTest(int id) async {
     List listGerminationTest = await helper.getGerminationTest(id);
 
-    // Converte o resultado para a classe Lot
     if (listGerminationTest.isNotEmpty) {
-      return GerminationTest.fromMap(listGerminationTest
-          .first); // Usa o método fromMap para criar a instância
+      return GerminationTest.fromMap(listGerminationTest.first);
     } else {
       throw Exception('Nenhum Teste de Germinação com o ID $id encontrado');
     }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_seedbyseed/database/database_app.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
@@ -44,6 +46,29 @@ class LotHelper {
     );
 
     return listLot;
+  }
+
+  Future<Lot?> getDailyCount(int idGerminationTest, int idLot) async {
+    final List listLot = await getLot(idGerminationTest, idLot);
+
+    if (listLot.isNotEmpty) {
+      var map = listLot.first;
+      return Lot.fromMap(map)
+        ..dailyCount = jsonDecode(map[LotConst.kDAILYCOUNTCOLUMN]);
+    }
+    return null; // Retorna null se não encontrar o teste
+  }
+
+  Future<void> updateDailyCount(int idGerminationTest, Lot lot) async {
+    final Database database = await _databaseApp.getDatabase;
+
+    await database.update(
+      tableName,
+      {LotConst.kDAILYCOUNTCOLUMN: jsonEncode(lot.dailyCount)},
+      where:
+          '${LotConst.kIDGERMINATIONTESTFOREIGNKEY} = ? AND ${LotConst.kIDLOTCOLUMN} = ?',
+      whereArgs: [idGerminationTest, lot.id],
+    );
   }
 
   Future<void> updateLot(Lot lot) async {

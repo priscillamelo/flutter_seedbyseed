@@ -38,6 +38,23 @@ class LotRepository extends ChangeNotifier {
     }
   }
 
+  Future<Map<int, List<int>?>>? getDailyCountLot(
+      int idGerminationTest, int idLot) async {
+    Lot? lot = await helper.getDailyCount(idGerminationTest, idLot);
+
+    if (lot != null) {
+      return lot.dailyCount;
+    } else {
+      throw Exception('DailyCount não encontrado!');
+    }
+  }
+
+  Future<void> updateDailyCountLot(int idGerminationTest, Lot lot) async {
+    await helper.updateDailyCount(idGerminationTest, lot);
+
+    notifyListeners();
+  }
+
   Future<void> updateLot(Lot lot) async {
     await helper.updateLot(lot);
     notifyListeners();

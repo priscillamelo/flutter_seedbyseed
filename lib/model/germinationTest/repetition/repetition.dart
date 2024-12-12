@@ -1,15 +1,10 @@
 import 'package:flutter_seedbyseed/service/germinationTest/repetition/repetition_const.dart';
-import 'package:intl/intl.dart';
 
 class Repetition {
   late int id;
   late int lotId;
   late int seedsTotal;
   late int germinatedSeeds;
-  Map<int, int> dailyCount = {};
-  int currentDay = 0;
-  static String lastRecordedDate =
-      ''; // Para armazenar a última data registrada
 
   Repetition(
       {required this.lotId,
@@ -31,7 +26,7 @@ class Repetition {
     lotId = map[RepetitionConst.kIDLOTFOREIGNKEYREPETITION];
   }
 
-  // Função para adicionar sementes germinadas
+  /* // Função para adicionar sementes germinadas
   void adicionarSementesGerminadas(int germinatedSeeds) {
     String currentDate = DateFormat('yyyy-MM-dd')
         .format(DateTime.now()); // Obtém a data atual no formato 'yyyy-MM-dd'
@@ -50,5 +45,5 @@ class Repetition {
       print(
           "Sementes Germinadas (atualizadas) no Dia $currentDay: $germinatedSeeds");
     }
-  }
+  } */
 }
