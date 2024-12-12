@@ -11,16 +11,19 @@ class GerminationTest {
   late int lastCount;
   late int totalSeeds;
   late int germinatedSeeds;
+  int currentDay = 1;
+  String lastRecordedDate = '';
 
-  GerminationTest(
-      {required this.species,
-      required this.materialUsed,
-      required this.substratoUsed,
-      required this.temperature,
-      required this.firstCount,
-      required this.lastCount,
-      required this.totalSeeds,
-      required this.germinatedSeeds});
+  GerminationTest({
+    required this.species,
+    required this.materialUsed,
+    required this.substratoUsed,
+    required this.temperature,
+    required this.firstCount,
+    required this.lastCount,
+    required this.totalSeeds,
+    required this.germinatedSeeds,
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -31,7 +34,7 @@ class GerminationTest {
       GerminationTestConst.kFIRSTCOUNTCOLUMN: firstCount,
       GerminationTestConst.kLASTCOUNTCOLUMN: lastCount,
       GerminationTestConst.kTOTALSEEDSCOLUMN: totalSeeds,
-      GerminationTestConst.kGERMINATEDSEEDSCOLUMN: germinatedSeeds
+      GerminationTestConst.kGERMINATEDSEEDSCOLUMN: germinatedSeeds,
     };
   }
 
