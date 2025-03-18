@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_seedbyseed/interface/page/add_germinated_seeds.dart';
-import 'package:flutter_seedbyseed/interface/page/add_germination_test.dart';
-import 'package:flutter_seedbyseed/interface/widget/completed_tab.dart';
+import 'package:flutter_seedbyseed/interface/screens/add_germinated_seeds.dart';
+import 'package:flutter_seedbyseed/interface/screens/add_germination_test.dart';
+import 'package:flutter_seedbyseed/interface/screens/details_germination_test.dart';
+import 'package:flutter_seedbyseed/interface/widget/finished_tab.dart';
 import 'package:flutter_seedbyseed/interface/widget/progress_tab.dart';
+import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
 import 'package:flutter_seedbyseed/route/routes.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
@@ -50,6 +52,8 @@ class MyApp extends StatelessWidget {
             const AddGerminationTest(),
         PageRoutes.kADD_GERMINATEDSEEDS: (context) =>
             const AddGerminatedSeeds(),
+        PageRoutes.kDETAILS_GERMINATIONTEST: (context) =>
+            const DetailsGerminationTest(),
 
         //PageRoutes.kUPDATE_GERMINATIONTEST: (context) => const UpdateGerminationTest(),
       },
@@ -76,6 +80,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    // GerminationTest.calculateIVG(null);
+    GerminationTest.totalUngerminatedSeed();
+    GerminationTest.calculateMeanRepetition();
+
     return Scaffold(
       // TODO: CRIAR UM COMPONENT PARA APPBAR
       appBar: AppBar(
@@ -124,7 +132,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       body: TabBarView(
           controller: _tabController,
-          children: const [ProgressTab(), CompletedTab()]),
+          children: const [ProgressTab(), FinishedTab()]),
     );
   }
 }

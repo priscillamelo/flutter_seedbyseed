@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/widget/repetition_future_builder.dart';
+import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
 
 class LotFutureBuilder extends StatefulWidget {
-  final int idGerminationTest;
+  final GerminationTest germinationTest;
 
-  const LotFutureBuilder({super.key, required this.idGerminationTest});
+  const LotFutureBuilder({super.key, required this.germinationTest});
 
   @override
   State<LotFutureBuilder> createState() => _LotFutureBuilderState();
@@ -24,7 +25,7 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
   void initState() {
     super.initState();
     lotRepository = LotRepository();
-    listLot = lotRepository.getAllLots(widget.idGerminationTest);
+    listLot = lotRepository.getAllLots(widget.germinationTest.id);
     _pageViewController = PageController();
   }
 
@@ -61,7 +62,7 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
                             )
                           : const SizedBox(width: 48),
                       Text(
-                        "Lote ${_currentPageIndex + 1}",
+                        "Lote ${snapshot.data![_currentPageIndex].numberLot}",
                         style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
@@ -90,16 +91,15 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
                         setState(() {
                           _currentPageIndex = index; // Atualiza o lote atual
                           //print(lastPage);
-                          lastPage =
-                              _currentPageIndex == snapshot.data!.length - 1;
-                          print(lastPage);
                         });
                       },
                       itemBuilder: (context, index) {
+                        lastPage =
+                            _currentPageIndex == snapshot.data!.length - 1;
                         return Center(
                           child: RepetitionFutureBuilder(
                             idLot: snapshot.data![index].id,
-                            idGerminationTest: widget.idGerminationTest,
+                            germinationTest: widget.germinationTest,
                             lastPage: lastPage,
                           ),
                         );

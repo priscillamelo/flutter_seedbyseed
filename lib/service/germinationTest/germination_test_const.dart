@@ -10,6 +10,10 @@ class GerminationTestConst {
   static const String kTOTALSEEDSCOLUMN = 'total_seeds_germination_test';
   static const String kGERMINATEDSEEDSCOLUMN =
       'germinated_seeds_germination_test';
+  static const String kCURRENTDAYCOLUMN = 'current_day_germination_test';
+  static const String kLASTRECORDEDDATECOLUMN =
+      'last_recorded_date_germination_test';
+  static const String kFINISHEDCOLUMN = 'finished_germination_test';
 
   //static const String kRESPONSIBLECOLUMN =  'responsible_germination_test';
 }

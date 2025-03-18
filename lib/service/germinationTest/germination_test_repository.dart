@@ -12,18 +12,39 @@ class GerminationTestRepository extends ChangeNotifier {
   }
 
   _initRepository() async {
-    await getAllGerminationTest();
+    await getAllProgressGerminationTest();
   }
 
   Future<int> addGerminationTest(GerminationTest germinationTest) async {
-    int idGerminationTest = await helper.insertGerminationTest(germinationTest);
+    int idGerminationTest = await helper.insert(germinationTest);
 
     notifyListeners();
     return idGerminationTest;
   }
 
-  Future<List<GerminationTest>> getAllGerminationTest() async {
-    List mapGerminationTest = await helper.getAllGerminationTest();
+  Future<List<GerminationTest>> getAllProgressGerminationTest() async {
+    List mapGerminationTest = await helper.getAllProgress();
+    List<GerminationTest> allGerminationTest = [];
+
+    for (Map g in mapGerminationTest) {
+      allGerminationTest.add(GerminationTest.fromMap(g));
+    }
+
+    return allGerminationTest;
+  }
+/*   Future<List<GerminationTest>> getAllGerminationTest() async {
+    List mapGerminationTest = await helper.getAll();
+    List<GerminationTest> allGerminationTest = [];
+
+    for (Map g in mapGerminationTest) {
+      allGerminationTest.add(GerminationTest.fromMap(g));
+    }
+
+    return allGerminationTest;
+  } */
+
+  Future<List<GerminationTest>> getAllFinishedGerminationTest() async {
+    List mapGerminationTest = await helper.getAllFinished();
     List<GerminationTest> allGerminationTest = [];
 
     for (Map g in mapGerminationTest) {
@@ -34,7 +55,7 @@ class GerminationTestRepository extends ChangeNotifier {
   }
 
   Future<GerminationTest> getGerminationTest(int id) async {
-    List listGerminationTest = await helper.getGerminationTest(id);
+    List listGerminationTest = await helper.get(id);
 
     if (listGerminationTest.isNotEmpty) {
       return GerminationTest.fromMap(listGerminationTest.first);
@@ -45,7 +66,7 @@ class GerminationTestRepository extends ChangeNotifier {
 
   Future<int> updateGerminationTest(GerminationTest germinationTest) async {
     int numberRowsAffected;
-    numberRowsAffected = await helper.updateGerminationTest(germinationTest);
+    numberRowsAffected = await helper.update(germinationTest);
 
     notifyListeners();
     return numberRowsAffected;
@@ -53,7 +74,7 @@ class GerminationTestRepository extends ChangeNotifier {
 
   Future<int> deleteGerminationTest(int id) async {
     int numberRowsAffected;
-    numberRowsAffected = await helper.deleteGerminationTest(id);
+    numberRowsAffected = await helper.delete(id);
 
     notifyListeners();
     return numberRowsAffected;

@@ -6,17 +6,18 @@ import 'package:flutter_seedbyseed/model/germinationTest/repetition/repetition.d
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/repetition/repetition_repository.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class RepetitionFutureBuilder extends StatefulWidget {
   final int idLot;
-  final int idGerminationTest;
+  final GerminationTest germinationTest;
   final bool lastPage;
   const RepetitionFutureBuilder(
       {super.key,
       required this.idLot,
       required this.lastPage,
-      required this.idGerminationTest});
+      required this.germinationTest});
 
   @override
   State<RepetitionFutureBuilder> createState() =>
@@ -29,6 +30,7 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
   late GerminationTestRepository testRepository;
   late Future<List<Repetition>> listRepetition;
   List<int> listGerminatedSeeds = [];
+  int day = 1;
 
   @override
   void initState() {
@@ -39,6 +41,12 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
 
   @override
   Widget build(BuildContext context) {
+    int valueSlider = 0;
+    if (widget.germinationTest.lastRecordedDate !=
+        DateFormat('dd/MM/yyyy').format(DateTime.now())) {
+      day = widget.germinationTest.currentDay;
+    }
+    GerminationTest test = widget.germinationTest;
     lotRepository = Provider.of<LotRepository>(context);
     testRepository = Provider.of<GerminationTestRepository>(context);
     return FutureBuilder(
@@ -49,13 +57,12 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
               listGerminatedSeeds =
                   List.generate(snapshot.data!.length, (index) => 0);
             }
-            int currentDay = snapshot.data!.first.currentDay;
-            if (currentDay == 0) currentDay++;
+
             return Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    "Dia $currentDay",
+                    "Dia $day - ${DateFormat('dd/MM/yyyy').format(DateTime.now())}",
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.w600),
                   ),
@@ -63,23 +70,30 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
                       shrinkWrap: true,
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
+                        valueSlider = snapshot.data![index].seedsTotal -
+                            snapshot.data![index].germinatedSeeds;
+
                         return Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text("Repetição ${index + 1}"),
                               Padding(
                                 padding: const EdgeInsets.all(16.0),
-                                child: SliderComponent(
-                                  valueMax: snapshot.data![index].seedsTotal,
-                                  totalGerminatedSeeds: (germinatedSeeds) {
-                                    setState(() {
-                                      listGerminatedSeeds[index] =
-                                          germinatedSeeds.round();
-                                    });
-                                    debugPrint(
-                                        "Lista de sementes germinadas: $listGerminatedSeeds");
-                                  },
-                                ),
+                                child: valueSlider > 0
+                                    ? SliderComponent(
+                                        valueMax: valueSlider,
+                                        totalGerminatedSeeds:
+                                            (germinatedSeeds) {
+                                          setState(() {
+                                            listGerminatedSeeds[index] =
+                                                germinatedSeeds.round();
+                                          });
+                                          debugPrint(
+                                              "Lista de sementes germinadas: $listGerminatedSeeds");
+                                        },
+                                      )
+                                    : const Text(
+                                        "Todas as sementes foram germinadas!"),
                               ),
                             ]);
                       }),
@@ -89,44 +103,63 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                     )),
                     onPressed: () async {
-                      Lot lot = await lotRepository.getLot(
-                          widget.idGerminationTest, widget.idLot);
-                      GerminationTest? test = await testRepository
-                          .getGerminationTest(widget.idGerminationTest);
+                      if (valueSlider > 0) {
+                        Lot lot =
+                            await lotRepository.getLot(test.id, widget.idLot);
 
-                      for (int i = 0; i < snapshot.data!.length; i++) {
-                        snapshot.data![i].germinatedSeeds +=
-                            listGerminatedSeeds[i];
-                        test.germinatedSeeds += listGerminatedSeeds[i];
+                        for (int i = 0; i < snapshot.data!.length; i++) {
+                          snapshot.data![i].germinatedSeeds +=
+                              listGerminatedSeeds[i];
+                          test.germinatedSeeds += listGerminatedSeeds[i];
+                          repetitionRepository
+                              .updateRepetition(snapshot.data![i]);
+                          lot.germinatedSeedPerLot += listGerminatedSeeds[i];
+                        }
 
-                        /*       debugPrint(
-                            "TOTAL DE SEMENTES GERMINADAS DA REPETIÇÃO $i: ${snapshot.data![i].germinatedSeeds}"); */
-                        repetitionRepository
-                            .updateRepetition(snapshot.data![i]);
+                        debugPrint(
+                            "ÚLTIMA DATA SALVA: ${test.lastRecordedDate}");
+                        debugPrint("ÚLTIMO DIA SALVO: ${test.currentDay}");
 
-                        lot.germinatedSeedPerLot += listGerminatedSeeds[i];
-                      }
-                      debugPrint(
-                          "TOTAL DE SEMENTES GERMINADAS DO LOTE ${lot.id}: ${lot.germinatedSeedPerLot}");
+                        if (test.lastRecordedDate !=
+                            DateFormat('dd/MM/yyyy').format(DateTime.now())) {
+                          test.currentDay++;
+                          test.lastRecordedDate =
+                              DateFormat('dd/MM/yyyy').format(DateTime.now());
+                          debugPrint("${test.currentDay}");
+                        }
 
-                      /* debugPrint(
-                            "TOTAL DE SEMENTES GERMINADAS DO TESTE DE GERMINAÇÃO ${test.id}: ${test.germinatedSeeds}"); */
-                      //test.germinatedSeeds = lot.germinatedSeedPerLot;
+                        lot.addDailyCount(day, listGerminatedSeeds);
+                        if (day == test.lastCount) {
+                          test.finished = 1;
+                          //test.calculateIVG(lot);
+                        }
 
-                      testRepository.updateGerminationTest(test);
-                      debugPrint(
-                          "TOTAL DE SEMENTES GERMINADAS DO TESTE DE GERMINAÇÃO ${test.id}: ${test.germinatedSeeds}");
+                        debugPrint("DAILY COUNT: ${lot.dailyCount}");
 
-                      lotRepository.updateLot(lot);
+                        testRepository.updateGerminationTest(test);
+                        lotRepository.updateLot(lot);
 
-                      if (context.mounted && widget.lastPage) {
+                        if (context.mounted && widget.lastPage) {
+                          Navigator.pop(context);
+                        }
+                      } else {
+                        print(
+                            "Status do teste de germinacao antes de finalizar: ${widget.germinationTest.finished}");
+                        widget.germinationTest.finished = 1;
+                        testRepository
+                            .updateGerminationTest(widget.germinationTest);
+
+                        print(
+                            "Status do teste de germinacao depois de finalizar: ${widget.germinationTest.finished}");
                         Navigator.pop(context);
                       }
                     },
-                    child: const Text(
-                      'Salvar Dados',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    child: Text(
+                      valueSlider > 0
+                          ? 'Salvar Dados'
+                          : 'Finalizar Teste de Germinação',
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ]);

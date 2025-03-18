@@ -19,6 +19,7 @@ class _SliderComponentState extends State<SliderComponent> {
   @override
   Widget build(BuildContext context) {
     seedsTotal = widget.valueMax.toDouble();
+    print(seedsTotal);
     return Slider(
       min: 0.0,
       max: seedsTotal,

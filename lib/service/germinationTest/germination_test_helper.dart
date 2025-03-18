@@ -7,7 +7,7 @@ class GerminationTestHelper {
   final DatabaseApp _databaseApp = DatabaseApp.instanceDatabaseApp;
   final String tableName = GerminationTestConst.kGERMINATIONTESTTABLE;
 
-  Future<int> insertGerminationTest(GerminationTest germinationTest) async {
+  Future<int> insert(GerminationTest germinationTest) async {
     final Database database = await _databaseApp.getDatabase;
 
     int idGerminationTest = await database.insert(
@@ -19,7 +19,7 @@ class GerminationTestHelper {
     return idGerminationTest;
   }
 
-  Future<List> getGerminationTest(int id) async {
+  Future<List> get(int id) async {
     final Database database = await _databaseApp.getDatabase;
     final List listGerminationTest = await database.query(tableName,
         limit: 1,
@@ -29,14 +29,35 @@ class GerminationTestHelper {
     return listGerminationTest;
   }
 
-  Future<List> getAllGerminationTest() async {
+  Future<List> getAllProgress() async {
+    final Database database = await _databaseApp.getDatabase;
+    final List listGerminationTest = await database.query(
+      tableName,
+      where: '${GerminationTestConst.kFINISHEDCOLUMN} = ?',
+      whereArgs: [0],
+    );
+
+    return listGerminationTest;
+  }
+/*   Future<List> getAll() async {
     final Database database = await _databaseApp.getDatabase;
     final List listGerminationTest = await database.query(tableName);
 
     return listGerminationTest;
+  } */
+
+  Future<List> getAllFinished() async {
+    final Database database = await _databaseApp.getDatabase;
+    final List listGerminationTest = await database.query(
+      tableName,
+      where: '${GerminationTestConst.kFINISHEDCOLUMN} = ?',
+      whereArgs: [1],
+    );
+
+    return listGerminationTest;
   }
 
-  Future<int> updateGerminationTest(GerminationTest germinationTest) async {
+  Future<int> update(GerminationTest germinationTest) async {
     final Database database = await _databaseApp.getDatabase;
     late final int numberRowsAffected;
 
@@ -49,7 +70,7 @@ class GerminationTestHelper {
     return numberRowsAffected;
   }
 
-  Future<int> deleteGerminationTest(int id) async {
+  Future<int> delete(int id) async {
     final Database database = await _databaseApp.getDatabase;
     late final int numberRowsAffected;
 
