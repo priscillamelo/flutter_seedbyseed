@@ -49,13 +49,13 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
               listGerminatedSeeds =
                   List.generate(snapshot.data!.length, (index) => 0);
             }
-            int currentDay = snapshot.data!.first.currentDay;
-            if (currentDay == 0) currentDay++;
+            //int currentDay = snapshot.data!.first.currentDay;
+            //if (currentDay == 0) currentDay++;
             return Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
-                    "Dia $currentDay",
+                    "Dia currentDay",
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.w600),
                   ),

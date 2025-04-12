@@ -204,7 +204,8 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                   return Lot(
                                       idGerminationTest: idGerminationTest,
                                       numberLot: index + 1,
-                                      germinatedSeedPerLot: 0);
+                                      germinatedSeedPerLot: 0,
+                                      dailyCount: {});
                                 });
 
                                 List<int> listIdLot = [];
