@@ -7,6 +7,7 @@ class PageRoutes {
       "/add-repetition-germination-test";
   static const String kADD_GERMINATEDSEEDS = "/add-germinated-seeds";
   static const String kUPDATE_GERMINATIONTEST = "/update-germination-test";
+  static const String kDETAILS_GERMINATIONTEST = "/details-germination-test";
 
   //static const String kLOGIN_PAGE = "/login";
   //static const String kCREATE_ACCOUNT = "/create-account";

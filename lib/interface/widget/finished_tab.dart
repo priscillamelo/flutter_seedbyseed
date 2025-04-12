@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_seedbyseed/interface/widget/component/floating_button_component.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
 import 'package:flutter_seedbyseed/route/routes.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
@@ -7,14 +6,14 @@ import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.da
 import 'package:flutter_seedbyseed/service/germinationTest/repetition/repetition_repository.dart';
 import 'package:provider/provider.dart';
 
-class ProgressTab extends StatefulWidget {
-  const ProgressTab({super.key});
+class FinishedTab extends StatefulWidget {
+  const FinishedTab({super.key});
 
   @override
-  State<ProgressTab> createState() => _ProgressTabState();
+  State<FinishedTab> createState() => _FinishedTabState();
 }
 
-class _ProgressTabState extends State<ProgressTab> {
+class _FinishedTabState extends State<FinishedTab> {
   late LotRepository lotRepository;
   late List<Lot> listLot;
   RepetitionRepository repetitionRepository = RepetitionRepository();
@@ -25,9 +24,10 @@ class _ProgressTabState extends State<ProgressTab> {
     GerminationTestRepository testRepository =
         Provider.of<GerminationTestRepository>(context);
     lotRepository = Provider.of<LotRepository>(context);
+
     return Scaffold(
       body: FutureBuilder(
-          future: testRepository.getAllProgressGerminationTest(),
+          future: testRepository.getAllFinishedGerminationTest(),
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data!.isNotEmpty) {
               var data = snapshot.data;
@@ -43,36 +43,9 @@ class _ProgressTabState extends State<ProgressTab> {
                           onTap: () {
                             Navigator.pushNamed(
                               context,
-                              PageRoutes.kADD_GERMINATEDSEEDS,
+                              PageRoutes.kDETAILS_GERMINATIONTEST,
                               arguments: data[index],
                             );
-                          },
-                          onLongPress: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text("Remover teste"),
-                                    content: const Text(
-                                        "Deseja remover o teste de germinação?"),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text("Cancelar"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          testRepository.deleteGerminationTest(
-                                              data[index].id);
-                                          Navigator.pop(context);
-                                        },
-                                        child: const Text("Remover"),
-                                      ),
-                                    ],
-                                  );
-                                });
                           },
                           child: ListTile(
                             title: Column(
@@ -89,15 +62,14 @@ class _ProgressTabState extends State<ProgressTab> {
                                 // TODO: CRIAR UM COMPONENT DE TEXT()
                                 Flexible(
                                   child: Text(
-                                    "Total de Sementes: ${data[index].totalSeeds}",
-                                  ),
-                                ),
-                                Flexible(
-                                  child: Text(
                                     "Temperatura: ${data[index].temperature}",
                                   ),
                                 ),
-
+                                /* Flexible(
+                                  child: Text(
+                                    "Dia Atual: ${1}/${data[index].duration}",
+                                  ),
+                                ), */
                                 Flexible(
                                   child: Text(
                                     "Contagem Inicial: ${data[index].firstCount}",
@@ -115,37 +87,12 @@ class _ProgressTabState extends State<ProgressTab> {
                       },
                     ),
                   ),
-                  const Positioned(
-                      right: 16,
-                      bottom: 16,
-                      child: FloatingButtonSmallComponent()),
                 ],
               );
             } else {
-              return const TabProgressNoData();
+              return const Center(child: Text("Não Há Testes Finalizados!"));
             }
           }),
-    );
-  }
-}
-
-class TabProgressNoData extends StatelessWidget {
-  const TabProgressNoData({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          FloatingButtonLargeComponent(),
-          SizedBox(
-            height: 16,
-          ),
-          Text("Iniciar Teste de Germinação"),
-        ],
-      ),
     );
   }
 }
