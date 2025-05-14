@@ -46,7 +46,7 @@ class _DropdownButtonComponentState extends State<DropdownButtonComponent> {
                 typeEnum == 'Material'
                     ? widget.selectedMaterialOrSubstrate(newValue)
                     : widget.selectedMaterialOrSubstrate(newValue);
-                //debugPrint(dropdownValue);
+     
                 _otherSelected = false;
               } else {
                 _otherSelected = true;

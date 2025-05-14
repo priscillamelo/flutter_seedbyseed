@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_seedbyseed/database/database_app.dart';
 import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_const.dart';
@@ -21,7 +20,7 @@ class LotHelper {
       );
       return idLot;
     } catch (e) {
-      debugPrint("Erro ao adicionar o lot no banco");
+      //debugPrint("Erro ao adicionar o lot no banco");
     }
     return null;
   }

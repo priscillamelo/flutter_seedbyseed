@@ -33,29 +33,30 @@ class GerminationTestHelper {
     final Database database = await _databaseApp.getDatabase;
     final List listGerminationTest = await database.query(
       tableName,
-      where: '${GerminationTestConst.kFINISHEDCOLUMN} = ?',
-      whereArgs: [0],
+      where: '${GerminationTestConst.kSTATUSCOLUMN} = ?',
+      whereArgs: [GerminationTest.inProgress],
     );
 
     return listGerminationTest;
   }
-/*   Future<List> getAll() async {
-    final Database database = await _databaseApp.getDatabase;
-    final List listGerminationTest = await database.query(tableName);
-
-    return listGerminationTest;
-  } */
 
   Future<List> getAllFinished() async {
     final Database database = await _databaseApp.getDatabase;
     final List listGerminationTest = await database.query(
       tableName,
-      where: '${GerminationTestConst.kFINISHEDCOLUMN} = ?',
-      whereArgs: [1],
+      where: '${GerminationTestConst.kSTATUSCOLUMN} = ?',
+      whereArgs: [GerminationTest.finished],
     );
 
     return listGerminationTest;
   }
+
+  /*   Future<List> getAll() async {
+    final Database database = await _databaseApp.getDatabase;
+    final List listGerminationTest = await database.query(tableName);
+
+    return listGerminationTest;
+  } */
 
   Future<int> update(GerminationTest germinationTest) async {
     final Database database = await _databaseApp.getDatabase;

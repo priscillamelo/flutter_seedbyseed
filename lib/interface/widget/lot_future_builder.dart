@@ -17,7 +17,7 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
     with TickerProviderStateMixin {
   late LotRepository lotRepository;
   late Future<List<Lot>> listLot;
-  late PageController _pageViewController;
+  late final PageController _pageViewController;
   int _currentPageIndex = 0;
   bool lastPage = false;
 
@@ -31,87 +31,111 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
 
   @override
   void dispose() {
-    super.dispose();
     _pageViewController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: listLot,
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _currentPageIndex > 0
-                          ? IconButton(
-                              onPressed: () {
-                                _pageViewController.previousPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              },
-                              icon:
-                                  const Icon(Icons.arrow_back_ios_new_rounded),
-                              iconSize: 32,
-                            )
-                          : const SizedBox(width: 48),
-                      Text(
-                        "Lote ${snapshot.data![_currentPageIndex].numberLot}",
-                        style: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      _currentPageIndex < snapshot.data!.length - 1
-                          ? IconButton(
-                              onPressed: () {
-                                _pageViewController.nextPage(
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
-                              },
-                              icon: const Icon(Icons.arrow_forward_ios_rounded),
-                              iconSize: 32,
-                            )
-                          : const SizedBox(width: 48),
-                    ],
+    return FutureBuilder<List<Lot>>(
+      future: listLot,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final lots = snapshot.data!;
+
+          if (lots.isEmpty) {
+            return const Center(child: Text('Nenhum lote cadastrado'));
+          }
+
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 32),
+                child: Text(
+                  "Dia ${widget.germinationTest.currentDay}",
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                Expanded(
-                  child: PageView.builder(
-                      itemCount: snapshot.data!.length,
-                      controller: _pageViewController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentPageIndex = index; // Atualiza o lote atual
-                          //print(lastPage);
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        lastPage =
-                            _currentPageIndex == snapshot.data!.length - 1;
-                        return Center(
-                          child: RepetitionFutureBuilder(
-                            idLot: snapshot.data![index].id,
-                            germinationTest: widget.germinationTest,
-                            lastPage: lastPage,
-                          ),
-                        );
-                      }),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _currentPageIndex > 0
+                        ? IconButton(
+                            onPressed: () {
+                              _pageViewController.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                            iconSize: 32,
+                          )
+                        : const SizedBox(width: 48),
+                    Text(
+                      "Lote ${lots[_currentPageIndex].numberLot}",
+                      style: const TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    _currentPageIndex < lots.length - 1
+                        ? IconButton(
+                            onPressed: () {
+                              _pageViewController.nextPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                            icon: const Icon(Icons.arrow_forward_ios_rounded),
+                            iconSize: 32,
+                          )
+                        : const SizedBox(width: 48),
+                  ],
                 ),
-              ],
-            );
-          } else {
-            return const Center(
-              child: Text('Nenhum lote cadastrado'),
-            );
-          }
-        });
+              ),
+              Expanded(
+                child: PageView.builder(
+                  itemCount: lots.length,
+                  controller: _pageViewController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPageIndex = index;
+                    });
+                  },
+                  itemBuilder: (context, index) {
+                    lastPage = _currentPageIndex == lots.length - 1;
+                    return Center(
+                      child: RepetitionFutureBuilder(
+                        // isNewDay foi removido — lógica tratada fora
+                        lot: lots[index],
+                        germinationTest: widget.germinationTest,
+                        lastPage: lastPage,
+                        onUpdatePage: () {
+                          _pageViewController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+            child: Text('Erro ao carregar os dados: ${snapshot.error}'),
+          );
+        } else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      },
+    );
   }
 }

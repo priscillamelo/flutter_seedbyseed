@@ -1,12 +1,11 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+
+import 'dart:io';
 import 'package:flutter_seedbyseed/interface/screens/add_germinated_seeds.dart';
 import 'package:flutter_seedbyseed/interface/screens/add_germination_test.dart';
 import 'package:flutter_seedbyseed/interface/screens/details_germination_test.dart';
 import 'package:flutter_seedbyseed/interface/widget/finished_tab.dart';
 import 'package:flutter_seedbyseed/interface/widget/progress_tab.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
 import 'package:flutter_seedbyseed/route/routes.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
 import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
@@ -39,6 +38,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
+    
     return MaterialApp(
       title: 'Seed By Seed',
       debugShowCheckedModeBanner: false,
@@ -80,9 +80,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    // GerminationTest.calculateIVG(null);
-    GerminationTest.totalUngerminatedSeed();
-    GerminationTest.calculateMeanRepetition();
+    //GerminationTest.totalUngerminatedSeed();
+    //GerminationTest.calculateMeanRepetition();
 
     return Scaffold(
       // TODO: CRIAR UM COMPONENT PARA APPBAR
