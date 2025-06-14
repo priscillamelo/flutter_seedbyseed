@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/widget/component/text_form_field_component.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/enum/material_enum.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/enum/substrate_enum.dart';
+import 'package:flutter_seedbyseed/domain/enum/material_enum.dart';
+import 'package:flutter_seedbyseed/domain/enum/substrate_enum.dart';
 
 class DropdownButtonComponent extends StatefulWidget {
   final String typeEnum;
@@ -46,7 +46,7 @@ class _DropdownButtonComponentState extends State<DropdownButtonComponent> {
                 typeEnum == 'Material'
                     ? widget.selectedMaterialOrSubstrate(newValue)
                     : widget.selectedMaterialOrSubstrate(newValue);
-     
+
                 _otherSelected = false;
               } else {
                 _otherSelected = true;

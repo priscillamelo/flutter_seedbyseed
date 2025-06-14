@@ -23,7 +23,7 @@ class _SliderComponentState extends State<SliderComponent> {
   @override
   void initState() {
     super.initState();
-    debugPrint("Valor inicial: ${widget.valueStart}");
+    //debugPrint("Valor inicial: ${widget.valueStart}");
     // Inicializa o valor com o valor inicial vindo do widget
     valueGerminationSeed = widget.valueStart.toDouble();
     valueMax = widget.valueMax.toDouble();
@@ -38,13 +38,13 @@ class _SliderComponentState extends State<SliderComponent> {
       data: SliderTheme.of(context).copyWith(
         activeTrackColor: isEnabled
             ? colorScheme.primary
-            : colorScheme.onSurface.withOpacity(0.3),
+            : colorScheme.onSurface.withValues(alpha: 0.3),
         inactiveTrackColor: isEnabled
-            ? colorScheme.primary.withOpacity(0.3)
-            : colorScheme.onSurface.withOpacity(0.1),
+            ? colorScheme.primary.withValues(alpha: 0.3)
+            : colorScheme.onSurface.withValues(alpha: 0.1),
         thumbColor: isEnabled
             ? colorScheme.primary
-            : colorScheme.onSurface.withOpacity(0.4),
+            : colorScheme.onSurface.withValues(alpha: 0.4),
         trackHeight: 4.0,
         overlayColor: colorScheme.primary.withAlpha(32),
         valueIndicatorColor: colorScheme.primary,

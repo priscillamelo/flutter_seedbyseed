@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
+import 'package:flutter_seedbyseed/domain/export_excel.dart';
+import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
+import 'package:flutter_seedbyseed/domain/model/lot.dart';
+import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
 import 'package:provider/provider.dart';
 
 class DetailsGerminationTest extends StatefulWidget {
@@ -20,14 +21,14 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
     final GerminationTest testArgument =
         ModalRoute.of(context)!.settings.arguments as GerminationTest;
 
-    Future<List<Lot>> listLot = lotRepository.getAllLots(testArgument.id);
+    Future<List<Lot>> futureListLot = lotRepository.getAllLots(testArgument.id);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Detalhes do Teste de Germinação"),
         centerTitle: true,
       ),
       body: FutureBuilder(
-          future: listLot,
+          future: futureListLot,
           builder: (context, snapshot) {
             if (snapshot.hasData && snapshot.data!.isNotEmpty) {
               return Column(
@@ -65,8 +66,10 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
         heroTag: "exportarTesteGerminacao",
         tooltip: "Exportar dados do Teste de Germinação",
         backgroundColor: Theme.of(context).colorScheme.primary,
-        onPressed: () {
+        onPressed: () async {
+          List<Lot> listLot = await  futureListLot;
           //TODO: CRIAR A FUNÇÃO DE EXPORTAR O TESTE DE GERMINAÇÃO EM .CSV
+          exportarExcel(listLot);
         },
         child: Icon(
           Icons.download_rounded,
@@ -74,5 +77,6 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
         ),
       ),
     );
+
   }
 }

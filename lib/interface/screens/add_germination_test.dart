@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/widget/component/dropdown_button_component.dart';
 import 'package:flutter_seedbyseed/interface/widget/component/text_form_field_component.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/repetition/repetition.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/repetition/repetition_repository.dart';
+import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
+import 'package:flutter_seedbyseed/domain/model/lot.dart';
+import 'package:flutter_seedbyseed/domain/model/repetition.dart';
+import 'package:flutter_seedbyseed/persistence/repository/germination_test_repository.dart';
+import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
+import 'package:flutter_seedbyseed/persistence/repository/repetition_repository.dart';
+import 'package:flutter_seedbyseed/domain/verify_date.dart';
 import 'package:provider/provider.dart';
 
 class AddGerminationTest extends StatelessWidget {
@@ -37,6 +38,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
   final _formKey = GlobalKey<FormState>();
 
   final _especieController = TextEditingController();
+
   //final _responsavelController = TextEditingController();
   //final _duracaoController = TextEditingController(text: '0');
   final _loteController = TextEditingController();
@@ -157,106 +159,81 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                         });
                       },
                     ),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text(
-                              "Cancelar",
-                              style: TextStyle(
-                                fontSize: 24,
-                              ),
-                            ),
+                    Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Cancelar",
+                          style: TextStyle(
+                            fontSize: 24,
                           ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                GerminationTest germinationTest =
-                                    GerminationTest(
-                                        species: _especieController.text,
-                                        materialUsed: materialUsed,
-                                        substratoUsed: substrateUsed,
-                                        temperature:
-                                            _temperaturaController.text,
-                                        firstCount: int.parse(
-                                            _contagemInicialController.text),
-                                        lastCount: int.parse(
-                                            _contagemFinalController.text),
-                                        totalSeeds:
-                                            int.parse(
-                                                    _repeticaoController.text) *
-                                                int.parse(
-                                                    _sementesRepeticaoController
-                                                        .text),
-                                        germinatedSeeds: 0);
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            final DateTime createdDate = VerifyDate.normalizeDayMonth(DateTime.now());
+                            GerminationTest germinationTest = GerminationTest(
+                              species: _especieController.text,
+                              materialUsed: materialUsed,
+                              substratoUsed: substrateUsed,
+                              temperature: _temperaturaController.text,
+                              createdAt: createdDate.toString(),
+                              firstCount: int.parse(_contagemInicialController.text),
+                              lastCount: int.parse(_contagemFinalController.text),
+                              totalSeeds:
+                                  int.parse(_repeticaoController.text) * int.parse(_sementesRepeticaoController.text),
+                            );
 
-                                int days = germinationTest.lastCount -
-                                    germinationTest.firstCount;
+                            int days = germinationTest.lastCount - germinationTest.firstCount;
 
-                                Future<int> idFuture = testRepository
-                                    .addGerminationTest(germinationTest);
-                                int idGerminationTest = await idFuture;
+                            Future<int> idFuture = testRepository.addGerminationTest(germinationTest);
+                            int idGerminationTest = await idFuture;
 
-                                listLot = List<Lot>.generate(
-                                    int.parse(_loteController.text), (index) {
-                                  return Lot(
-                                      idGerminationTest: idGerminationTest,
-                                      numberLot: index + 1,
-                                      germinatedSeedPerLot: 0,
-                                      dailyCount: {
-                                        for (int i = 1; i <= days; i++)
-                                          i: List<int>.filled(
-                                              int.parse(
-                                                  _repeticaoController.text),
-                                              0),
-                                      });
-                                });
+                            listLot = List<Lot>.generate(int.parse(_loteController.text), (index) {
+                              return Lot(idGerminationTest: idGerminationTest, numberLot: index + 1, dailyCount: {
+                                for (int i = 1; i <= days; i++)
+                                  i: List<int>.filled(int.parse(_repeticaoController.text), 0),
+                              });
+                            });
 
-                                List<int> listIdLot = [];
+                            List<int> listIdLot = [];
 
-                                for (var lot in listLot) {
-                                  idFuture = lotRepository.addLot(lot);
-                                  int id = await idFuture;
-                                  listIdLot.add(id);
-                                }
+                            for (var lot in listLot) {
+                              idFuture = lotRepository.addLot(lot);
+                              int id = await idFuture;
+                              listIdLot.add(id);
+                            }
 
-                                int repetitionCount =
-                                    int.parse(_repeticaoController.text);
+                            int repetitionCount = int.parse(_repeticaoController.text);
 
-                                for (int i = 0; i < listIdLot.length; i++) {
-                                  for (int j = 0; j < repetitionCount; j++) {
-                                    Repetition repetition = Repetition(
-                                        lotId: listIdLot[i],
-                                        seedsTotal: int.parse(
-                                            _sementesRepeticaoController.text),
-                                        germinatedSeeds: 0);
-                                    repetitionRepository
-                                        .addRepetition(repetition);
-                                  }
-                                }
-
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            '${germinationTest.species} cadastrado!')),
-                                  );
-                   
-                                  Navigator.pop(context);
-                                }
+                            for (int i = 0; i < listIdLot.length; i++) {
+                              for (int j = 0; j < repetitionCount; j++) {
+                                Repetition repetition = Repetition(
+                                    lotId: listIdLot[i], seedsTotal: int.parse(_sementesRepeticaoController.text));
+                                repetitionRepository.addRepetition(repetition);
                               }
-                            },
-                            child: const Text(
-                              "Cadastrar Teste",
-                              style: TextStyle(
-                                fontSize: 24,
-                              ),
-                            ),
+                            }
+
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('${germinationTest.species} cadastrado!')),
+                              );
+
+                              Navigator.pop(context);
+                            }
+                          }
+                        },
+                        child: const Text(
+                          "Cadastrar Teste",
+                          style: TextStyle(
+                            fontSize: 24,
                           ),
-                        ])
+                        ),
+                      ),
+                    ])
                   ]),
             ),
           ),

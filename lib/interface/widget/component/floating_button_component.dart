@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_seedbyseed/route/routes.dart';
+import 'package:flutter_seedbyseed/infra/route/routes.dart';
 
 class FloatingButtonLargeComponent extends StatelessWidget {
   const FloatingButtonLargeComponent({super.key});

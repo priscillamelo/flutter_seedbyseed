@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
-
-import 'dart:io';
 import 'package:flutter_seedbyseed/interface/screens/add_germinated_seeds.dart';
 import 'package:flutter_seedbyseed/interface/screens/add_germination_test.dart';
 import 'package:flutter_seedbyseed/interface/screens/details_germination_test.dart';
 import 'package:flutter_seedbyseed/interface/widget/finished_tab.dart';
 import 'package:flutter_seedbyseed/interface/widget/progress_tab.dart';
-import 'package:flutter_seedbyseed/route/routes.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
+import 'package:flutter_seedbyseed/infra/route/routes.dart';
+import 'package:flutter_seedbyseed/persistence/repository/germination_test_repository.dart';
+import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
 import 'package:provider/provider.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
+  //
+  //WidgetsFlutterBinding.ensureInitialized();
 
   runApp(
     MultiProvider(
@@ -36,11 +30,11 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
-      title: 'Seed By Seed',
+      title: 'SeedBySeed',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),

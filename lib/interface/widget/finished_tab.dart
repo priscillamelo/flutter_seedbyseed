@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
-import 'package:flutter_seedbyseed/route/routes.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/germination_test_repository.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/repetition/repetition_repository.dart';
+import 'package:flutter_seedbyseed/domain/model/lot.dart';
+import 'package:flutter_seedbyseed/infra/route/routes.dart';
+import 'package:flutter_seedbyseed/persistence/repository/germination_test_repository.dart';
+import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
+import 'package:flutter_seedbyseed/persistence/repository/repetition_repository.dart';
 import 'package:provider/provider.dart';
 
 class FinishedTab extends StatefulWidget {

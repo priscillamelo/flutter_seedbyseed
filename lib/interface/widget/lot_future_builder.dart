@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/widget/repetition_future_builder.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/lot/lot.dart';
-import 'package:flutter_seedbyseed/service/germinationTest/lot/lot_repository.dart';
+import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
+import 'package:flutter_seedbyseed/domain/model/lot.dart';
+import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
 
 class LotFutureBuilder extends StatefulWidget {
   final GerminationTest germinationTest;
+  final bool isNewDay;
 
-  const LotFutureBuilder({super.key, required this.germinationTest});
+  const LotFutureBuilder({
+    super.key,
+    required this.germinationTest,
+    required this.isNewDay,
+  });
 
   @override
   State<LotFutureBuilder> createState() => _LotFutureBuilderState();
@@ -111,10 +116,10 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
                     lastPage = _currentPageIndex == lots.length - 1;
                     return Center(
                       child: RepetitionFutureBuilder(
-                        // isNewDay foi removido — lógica tratada fora
                         lot: lots[index],
                         germinationTest: widget.germinationTest,
                         lastPage: lastPage,
+                        isNewDay: widget.isNewDay,
                         onUpdatePage: () {
                           _pageViewController.nextPage(
                             duration: const Duration(milliseconds: 300),

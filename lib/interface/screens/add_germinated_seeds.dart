@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/widget/lot_future_builder.dart';
-import 'package:flutter_seedbyseed/model/germinationTest/germination_test.dart';
-import 'package:flutter_seedbyseed/verify_date.dart';
+import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
+import 'package:flutter_seedbyseed/domain/verify_date.dart';
 
 class AddGerminatedSeeds extends StatefulWidget {
   const AddGerminatedSeeds({super.key});
@@ -12,7 +12,9 @@ class AddGerminatedSeeds extends StatefulWidget {
 
 class _AddSeedGerminationState extends State<AddGerminatedSeeds> {
   late GerminationTest germinationTest;
+  late bool isAvailableDayCount;
   late Future<void> _initFuture;
+  bool isNewDay = false;
 
   @override
   void initState() {
@@ -25,14 +27,9 @@ class _AddSeedGerminationState extends State<AddGerminatedSeeds> {
     if (!mounted) return;
     germinationTest =
         ModalRoute.of(context)!.settings.arguments as GerminationTest;
-    bool isNewDay = await VerifyDate.loadAndCompareDate(DateTime.now());
-    debugPrint("isNewDay: $isNewDay");
+    isNewDay = await VerifyDate.loadAndCompareDate(DateTime.now());
 
-    if (isNewDay) {
-      setState(() {
-        germinationTest.currentDay++; // Atualiza localmente
-      });
-    }
+    isAvailableDayCount = germinationTest.verifyIsFirstCountAvailable();
   }
 
   @override
@@ -46,11 +43,25 @@ class _AddSeedGerminationState extends State<AddGerminatedSeeds> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Erro ao carregar: ${snapshot.error}'));
-          } else {
-            return LotFutureBuilder(germinationTest: germinationTest);
           }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Erro ao carregar: ${snapshot.error}'));
+          }
+
+            if (isAvailableDayCount) {
+              return LotFutureBuilder(
+                germinationTest: germinationTest,
+                isNewDay: isNewDay,
+              );
+            } else {
+              final firstCountDate = germinationTest.calculateFirstCountDate();
+              final String formattedDate =
+                  "${firstCountDate.day}/${firstCountDate.month}/${firstCountDate.year}";
+              return Text(
+                  "A contagem das sementes se inicia no dia $formattedDate");
+            }
+
         },
       ),
     );
