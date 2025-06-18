@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_seedbyseed/infra/config/notification_local_service.dart';
 import 'package:flutter_seedbyseed/interface/screens/add_germinated_seeds.dart';
 import 'package:flutter_seedbyseed/interface/screens/add_germination_test.dart';
 import 'package:flutter_seedbyseed/interface/screens/details_germination_test.dart';
@@ -7,11 +9,15 @@ import 'package:flutter_seedbyseed/interface/widget/progress_tab.dart';
 import 'package:flutter_seedbyseed/infra/route/routes.dart';
 import 'package:flutter_seedbyseed/persistence/repository/germination_test_repository.dart';
 import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
-  //
-  //WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await initializeDateFormatting('pt_BR', null);
+
+  await NotificationLocalService().init();
 
   runApp(
     MultiProvider(
@@ -30,7 +36,6 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -40,6 +45,16 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
         useMaterial3: true,
       ),
+      // Define os locales suportados pelo seu app
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('pt', 'BR'), // Português, Brasil
+        // Adicione outros locales se seu app for multi-idioma
+      ],
       routes: {
         PageRoutes.kHOME: (context) => const HomePage(),
         PageRoutes.kADD_GERMINATIONTEST: (context) =>

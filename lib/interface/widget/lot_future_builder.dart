@@ -24,7 +24,6 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
   late Future<List<Lot>> listLot;
   late final PageController _pageViewController;
   int _currentPageIndex = 0;
-  bool lastPage = false;
 
   @override
   void initState() {
@@ -42,104 +41,123 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return FutureBuilder<List<Lot>>(
       future: listLot,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final lots = snapshot.data!;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          if (lots.isEmpty) {
-            return const Center(child: Text('Nenhum lote cadastrado'));
-          }
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.error_outline, color: Colors.red, size: 40),
+                const SizedBox(height: 8),
+                Text(
+                  'Erro ao carregar os dados.\n${snapshot.error}',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
+            ),
+          );
+        }
 
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32),
-                child: Text(
-                  "Dia ${widget.germinationTest.currentDay}",
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
+        final lots = snapshot.data!;
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 24.0),
+              child: Center(
+                child: Chip(
+                  avatar: const Icon(Icons.calendar_today, size: 20),
+                  label: Text(
+                    "Dia ${widget.germinationTest.currentDay}",
+                    style: theme.textTheme.titleMedium,
                   ),
+                  backgroundColor: theme.colorScheme.secondaryContainer,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _currentPageIndex > 0
-                        ? IconButton(
-                            onPressed: () {
-                              _pageViewController.previousPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                              );
-                            },
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                            iconSize: 32,
-                          )
-                        : const SizedBox(width: 48),
-                    Text(
-                      "Lote ${lots[_currentPageIndex].numberLot}",
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    _currentPageIndex < lots.length - 1
-                        ? IconButton(
-                            onPressed: () {
-                              _pageViewController.nextPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                              );
-                            },
-                            icon: const Icon(Icons.arrow_forward_ios_rounded),
-                            iconSize: 32,
-                          )
-                        : const SizedBox(width: 48),
-                  ],
-                ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: _currentPageIndex > 0
+                        ? () {
+                            _pageViewController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        : null,
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded),
+                    iconSize: 32,
+                  ),
+                  Text(
+                    "Lote ${lots[_currentPageIndex].numberLot} de ${lots.length}",
+                    style: theme.textTheme.titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    onPressed: _currentPageIndex < lots.length - 1
+                        ? () {
+                            _pageViewController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        : null,
+                    icon: const Icon(Icons.arrow_forward_ios_rounded),
+                    iconSize: 32,
+                  ),
+                ],
               ),
-              Expanded(
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: PageView.builder(
                   itemCount: lots.length,
                   controller: _pageViewController,
                   onPageChanged: (index) {
-                    setState(() {
-                      _currentPageIndex = index;
-                    });
+                    setState(() => _currentPageIndex = index);
                   },
                   itemBuilder: (context, index) {
-                    lastPage = _currentPageIndex == lots.length - 1;
-                    return Center(
-                      child: RepetitionFutureBuilder(
-                        lot: lots[index],
-                        germinationTest: widget.germinationTest,
-                        lastPage: lastPage,
-                        isNewDay: widget.isNewDay,
-                        onUpdatePage: () {
+                    final lot = lots[index];
+                    final isLastPage = index == lots.length - 1;
+                    return RepetitionFutureBuilder(
+                      lot: lot,
+                      germinationTest: widget.germinationTest,
+                      lastPage: isLastPage,
+                      isNewDay: widget.isNewDay,
+                      onUpdatePage: () {
+                        if (!isLastPage) {
                           _pageViewController.nextPage(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
                           );
-                        },
-                      ),
+                        }
+                      },
                     );
                   },
                 ),
               ),
-            ],
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Erro ao carregar os dados: ${snapshot.error}'),
-          );
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
+            ),
+          ],
+        );
       },
     );
   }

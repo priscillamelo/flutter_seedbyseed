@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/domain/model/lot.dart';
 import 'package:flutter_seedbyseed/infra/route/routes.dart';
+import 'package:flutter_seedbyseed/interface/widget/component/delete_germination_test.dart';
+import 'package:flutter_seedbyseed/interface/widget/component/germination_test_card.dart';
 import 'package:flutter_seedbyseed/persistence/repository/germination_test_repository.dart';
 import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
 import 'package:flutter_seedbyseed/persistence/repository/repetition_repository.dart';
@@ -14,6 +16,7 @@ class FinishedTab extends StatefulWidget {
 }
 
 class _FinishedTabState extends State<FinishedTab> {
+  late GerminationTestRepository testRepository;
   late LotRepository lotRepository;
   late List<Lot> listLot;
   RepetitionRepository repetitionRepository = RepetitionRepository();
@@ -21,8 +24,7 @@ class _FinishedTabState extends State<FinishedTab> {
 
   @override
   Widget build(BuildContext context) {
-    GerminationTestRepository testRepository =
-        Provider.of<GerminationTestRepository>(context);
+    testRepository = Provider.of<GerminationTestRepository>(context);
     lotRepository = Provider.of<LotRepository>(context);
 
     return Scaffold(
@@ -39,7 +41,8 @@ class _FinishedTabState extends State<FinishedTab> {
                       separatorBuilder: (context, index) => const Divider(),
                       itemCount: data!.length,
                       itemBuilder: (context, index) {
-                        return GestureDetector(
+                        return GerminationTestCard(
+                          germinationTest: data[index],
                           onTap: () {
                             Navigator.pushNamed(
                               context,
@@ -47,42 +50,7 @@ class _FinishedTabState extends State<FinishedTab> {
                               arguments: data[index],
                             );
                           },
-                          child: ListTile(
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(data[index].species),
-                                Text(
-                                    "Sementes Germinadas: ${data[index].germinatedSeeds}"),
-                              ],
-                            ),
-                            trailing: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // TODO: CRIAR UM COMPONENT DE TEXT()
-                                Flexible(
-                                  child: Text(
-                                    "Temperatura: ${data[index].temperature}",
-                                  ),
-                                ),
-                                /* Flexible(
-                                  child: Text(
-                                    "Dia Atual: ${1}/${data[index].duration}",
-                                  ),
-                                ), */
-                                Flexible(
-                                  child: Text(
-                                    "Contagem Inicial: ${data[index].firstCount}",
-                                  ),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    "Contagem Final: ${data[index].lastCount}",
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          onLongPress: () => _confirmDeleteGerminationTest(context, data[index].id),
                         );
                       },
                     ),
@@ -93,6 +61,19 @@ class _FinishedTabState extends State<FinishedTab> {
               return const Center(child: Text("Não Há Testes Finalizados!"));
             }
           }),
+    );
+  }
+
+  void _confirmDeleteGerminationTest(BuildContext context, int germinationTestId) {
+    showConfirmationDialog(
+      context: context,
+      title: 'Remover teste',
+      content: 'Deseja remover o teste de germinação?',
+      onConfirm: () {
+        setState(() {
+          testRepository.deleteGerminationTest(germinationTestId);
+        });
+      },
     );
   }
 }

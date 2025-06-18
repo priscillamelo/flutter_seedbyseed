@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
+import 'package:flutter_seedbyseed/infra/config/notification_local_service.dart';
+import 'package:flutter_seedbyseed/interface/widget/component/delete_germination_test.dart';
 import 'package:flutter_seedbyseed/interface/widget/component/floating_button_component.dart';
 import 'package:flutter_seedbyseed/domain/model/lot.dart';
 import 'package:flutter_seedbyseed/infra/route/routes.dart';
@@ -45,6 +48,7 @@ class _ProgressTabState extends State<ProgressTab> {
             }
 
             var data = snapshot.data!;
+
             return Stack(
               children: [
                 ListView.builder(
@@ -52,17 +56,23 @@ class _ProgressTabState extends State<ProgressTab> {
                       horizontal: 12.0, vertical: 8.0),
                   itemCount: data.length,
                   itemBuilder: (context, index) {
+                    data.sort((a, b) => a
+                        .calculateCountDate(data[index].firstCount)
+                        .compareTo(
+                            b.calculateCountDate(data[index].firstCount)));
+
                     return GerminationTestCard(
                       germinationTest: data[index],
-                      onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          PageRoutes.kADD_GERMINATEDSEEDS,
-                          arguments: data[index],
-                        );
-                      },
-                      onLongPress: () => _confirmDeleteGerminationTest(
-                          context, data[index].id),
+                      onTap: data[index].verifyIsFirstCountAvailable()
+                          ? () {
+                              Navigator.pushNamed(
+                                context,
+                                PageRoutes.kADD_GERMINATEDSEEDS,
+                                arguments: data[index],
+                              );
+                            }
+                          : null,
+                      onLongPress: () => _showTestOptions(context, data[index]),
                     );
                   },
                 ),
@@ -76,30 +86,103 @@ class _ProgressTabState extends State<ProgressTab> {
     );
   }
 
-  void _confirmDeleteGerminationTest(
-      BuildContext context, int germinationTestId) {
-    showDialog(
+  void _showTestOptions(BuildContext context, GerminationTest test) {
+    showModalBottomSheet<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Remover teste"),
-        content: const Text("Deseja remover o teste de germinação?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                testRepository.deleteGerminationTest(germinationTestId);
-              });
-              Navigator.pop(context);
-            },
-            child: const Text("Remover"),
-          ),
-        ],
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+      builder: (context) {
+        return Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Editar teste'),
+              onTap: () {
+                Navigator.pop(context);
+                // Redirecionar para a tela de edição
+                Navigator.pushNamed(
+                  context,
+                  '/editar-teste',
+                  arguments: test,
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.check_circle_outline),
+              title: const Text('Finalizar teste'),
+              onTap: () {
+                Navigator.pop(context);
+                _confirmFinalizeTest(context, test);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_forever),
+              title: const Text('Remover teste'),
+              textColor: Colors.red,
+              iconColor: Colors.red,
+              onTap: () {
+                Navigator.pop(context);
+                _confirmDeleteTest(context, test.id);
+              },
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  void _confirmDeleteTest(BuildContext context, int testId) {
+    showConfirmationDialog(
+      context: context,
+      title: 'Remover teste',
+      content: 'Deseja remover o teste de germinação?',
+      onConfirm: () async {
+        await NotificationLocalService().cancelGerminationNotification(testId);
+        setState(() {
+          testRepository.deleteGerminationTest(testId);
+        });
+      },
+    );
+  }
+
+  void _confirmFinalizeTest(BuildContext context, GerminationTest test) {
+    showConfirmationDialog(
+      context: context,
+      title: 'Finalizar teste',
+      content: 'Deseja finalizar este teste agora?',
+      onConfirm: () async {
+        await finishTest(test);
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Teste finalizado com sucesso!"),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+
+        await NotificationLocalService().cancelGerminationNotification(test.id);
+      },
+    );
+  }
+
+  Future<void> finishTest(GerminationTest test) async {
+    listLot = await lotRepository.getAllLots(test.id);
+    for (var lot in listLot) {
+      lot.calculateIVGPerLot();
+      await lot.calculatePercAverageGerminatedSeeds();
+      await lot.totalGerminatedSeedPerLot();
+
+      await lotRepository.updateLot(lot);
+      debugPrint(
+          "Lote ${lot.numberLot} atualizado com sucesso! Total de sementes germinadas: ${lot.germinatedSeedPerLot}");
+    }
+    setState(() {
+      test.status = GerminationTest.finished;
+      testRepository.updateGerminationTest(test);
+    });
   }
 }
 

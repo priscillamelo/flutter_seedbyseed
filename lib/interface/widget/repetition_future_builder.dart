@@ -25,7 +25,8 @@ class RepetitionFutureBuilder extends StatefulWidget {
   });
 
   @override
-  State<RepetitionFutureBuilder> createState() => _RepetitionFutureBuilderState();
+  State<RepetitionFutureBuilder> createState() =>
+      _RepetitionFutureBuilderState();
 }
 
 class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
@@ -34,12 +35,23 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
   late GerminationTestRepository testRepository;
   late Future<List<Repetition>> listRepetition;
   List<int> listGerminatedSeeds = [];
+  bool hasChanges = false;
+  late int differenceDays;
+  int currentDay = 1;
+  late DateTime firstCount;
 
   @override
   void initState() {
     super.initState();
     repetitionRepository = RepetitionRepository();
     listRepetition = repetitionRepository.getAllRepetition(widget.lot.id);
+    firstCount = widget.germinationTest
+        .calculateCountDate(widget.germinationTest.firstCount);
+    debugPrint("First Count Date: $firstCount");
+    differenceDays = widget.germinationTest.calculateDifferenceDays(widget
+        .germinationTest
+        .calculateCountDate(widget.germinationTest.firstCount));
+    currentDay = differenceDays + 1;
   }
 
   @override
@@ -51,81 +63,177 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
             if (listGerminatedSeeds.isEmpty) {
-              final int currentDay = widget.germinationTest.currentDay;
+              debugPrint("DIFFERENCE DAYS: $differenceDays");
+              debugPrint("DAILYCOUNT: ${widget.lot.dailyCount}");
               debugPrint("CURRENTDAY: $currentDay");
-              listGerminatedSeeds = List.from(widget.lot.dailyCount[currentDay]!);
+              debugPrint(
+                  "DAILYCOUNT (CurrentDay): ${widget.lot.dailyCount[currentDay]}");
+              listGerminatedSeeds =
+                  List.from(widget.lot.dailyCount[currentDay]!);
             }
-            //debugPrint("${widget.lot.dailyCount[currentDay]!}");
-            /*final List<int> dayData = widget.lot.dailyCount[currentDay]!;
-            final firstEntry = widget.lot.dailyCount.entries.first;
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const SizedBox(height: 16),
+                Expanded(
+                  child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        Repetition repetition = snapshot.data![index];
+                        bool enabledSlider =
+                            repetition.germinatedSeeds == repetition.seedsTotal;
 
-            listGerminatedSeeds = List.generate(
-              firstEntry.value!.length,
-              (index) => dayData[index],
-            );*/
-
-            return Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-              ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    Repetition repetition = snapshot.data![index];
-
-                    return Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                      Text("Repetição ${index + 1}"),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: SliderComponent(
-                          valueMax: repetition.seedsTotal,
-                          totalGerminatedSeeds: (germinatedSeeds) {
-                            listGerminatedSeeds[index] = germinatedSeeds.round();
-
-                          },
-                          valueStart: listGerminatedSeeds[index],
-                        ),
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          elevation: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Repetição ${index + 1}",
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.eco,
+                                          size: 20, color: Colors.green),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: SliderComponent(
+                                          valueMax:
+                                              repetition.seedsTotal.toDouble(),
+                                          totalGerminatedSeeds:
+                                              (germinatedSeeds) {
+                                            setState(() {
+                                              listGerminatedSeeds[index] =
+                                                  germinatedSeeds.round();
+                                              hasChanges = true;
+                                            });
+                                          },
+                                          valueStart: listGerminatedSeeds[index]
+                                              .toDouble(),
+                                          enabledSlider: enabledSlider,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        "${listGerminatedSeeds[index]}",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge,
+                                      ),
+                                    ],
+                                  ),
+                                ]),
+                          ),
+                        );
+                      }),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(48),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                    icon: const Icon(Icons.save),
+                    label: const Text(
+                      "Salvar dados",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                    ]);
-                  }),
-              ElevatedButton(
-                style: const ButtonStyle(
-                  padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 32, vertical: 12)),
+                    ),
+                    onPressed: hasChanges
+                        ? () async {
+                            showDialog<void>(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (_) => const AlertDialog(
+                                content: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(width: 20),
+                                    Text("Salvando..."),
+                                  ],
+                                ),
+                              ),
+                            );
+                            await saveGerminationSeedsRepetition(
+                                snapshot.data!, listGerminatedSeeds);
+                            await saveGerminationSeedsLot(snapshot.data!);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Dados salvos com sucesso!"),
+                                  backgroundColor: Colors.green,
+                                  duration: Duration(seconds: 2),
+                                  behavior: SnackBarBehavior.fixed,
+                                ),
+                              );
+                            }
+                            if (context.mounted) {
+                              Navigator.pop(context); // Fecha o diálogo
+                            }
+
+                            debugPrint(
+                                "Lista de Sementes Germinadas -> $listGerminatedSeeds");
+
+                            int daysOfCount = widget.germinationTest.lastCount -
+                                widget.germinationTest.firstCount;
+
+                            bool lastDay = currentDay == (daysOfCount + 1);
+
+                            // verifica se é o último dia do teste de germinação para poder realizar o cálculo do IVG do Lote e mudar o status do teste para finalizado
+                            if (lastDay) {
+                              widget.lot.calculateIVGPerLot();
+                              await widget.lot.totalGerminatedSeedPerLot();
+                              await lotRepository.updateLot(widget.lot);
+                              await widget.germinationTest
+                                  .totalGerminatedSeedGerminationTest(
+                                      widget.germinationTest.id);
+
+                              if (widget.lastPage) {
+                                widget.germinationTest.status =
+                                    GerminationTest.finished;
+
+                                debugPrint(
+                                    "Status do Teste de Germinação: ${widget.germinationTest.status}");
+                              }
+                              await testRepository.updateGerminationTest(
+                                  widget.germinationTest);
+                            }
+
+                            // verifica se não é a última página de lotes: caso não seja, atualiza a página para o próximo lote, caso contrário, realiza o Navigator.pop()
+                            if (!widget.lastPage) {
+                              widget.onUpdatePage();
+                            } else {
+                              await saveGerminationSeedsTestGermination();
+                              if (context.mounted) {
+                                Navigator.pop(context);
+                              }
+                            }
+                          }
+                        : null,
+                  ),
                 ),
-                onPressed: () async {
-                  await saveGerminationSeedsRepetition(snapshot.data!, listGerminatedSeeds);
-                  await saveGerminationSeedsLot(snapshot.data!);
-
-                  debugPrint("Lista de Sementes Germinadas -> $listGerminatedSeeds");
-
-                  int daysOfCount = widget.germinationTest.lastCount - widget.germinationTest.firstCount;
-
-                  bool lastDay = widget.germinationTest.currentDay == daysOfCount;
-
-                  // verifica se é o último dia do teste de germinação para poder realizar o cálculo do IVG do Lote e mudar o status do teste para finalizado
-                  if (lastDay) {
-                    widget.lot.calculateIVGPerLot();
-                    lotRepository.updateLot(widget.lot);
-                    if (widget.lastPage) {
-                      widget.germinationTest.status = GerminationTest.finished;
-                      testRepository.updateGerminationTest(widget.germinationTest);
-                    }
-                  }
-
-                  // verifica se não é a última página de lotes: caso não seja, atualiza a página para o próximo lote, caso contrário, realiza o Navigator.pop()
-                  if (!widget.lastPage) {
-                    widget.onUpdatePage();
-                  } else {
-                    await saveGerminationSeedsTestGermination();
-                    if(context.mounted) {
-                      Navigator.pop(context);
-                    }
-                  }
-                },
-                child: const Text(
-                  "Salvar dados",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ]);
+                const SizedBox(height: 16),
+              ],
+            );
           } else {
             return const Center(
               child: Text('Nenhuma repetição cadastrada'),
@@ -134,38 +242,30 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
         });
   }
 
-  Future<void> saveGerminationSeedsRepetition(List<Repetition> listRepetition, List<int> listGerminatedSeeds) async {
-
+  Future<void> saveGerminationSeedsRepetition(
+      List<Repetition> listRepetition, List<int> listGerminatedSeeds) async {
     for (int i = 0; i < listRepetition.length; i++) {
-      if(widget.isNewDay) {
+      if (widget.isNewDay) {
         listRepetition[i].germinatedSeeds += listGerminatedSeeds[i];
-        debugPrint("Novo Dia: R${i + 1} -> ${listRepetition[i].germinatedSeeds}");
+        debugPrint(
+            "Novo Dia: R${i + 1} -> ${listRepetition[i].germinatedSeeds}");
       } else {
-        int newGerminatedSeeds = listGerminatedSeeds[i] - listRepetition[i].germinatedSeeds;
-        debugPrint("Novas Sementes Germinadas: R${i + 1} -> $newGerminatedSeeds");
+        int newGerminatedSeeds =
+            listGerminatedSeeds[i] - listRepetition[i].germinatedSeeds;
+        debugPrint(
+            "Novas Sementes Germinadas: R${i + 1} -> $newGerminatedSeeds");
         listRepetition[i].germinatedSeeds += newGerminatedSeeds;
       }
       await repetitionRepository.updateRepetition(listRepetition[i]);
     }
   }
 
-  /*void saveGerminationSeedsLot(List<Repetition> listRepetition) async {
-    widget.lot.dailyCount[widget.germinationTest.currentDay] =
-        listRepetition.map((repetition) => repetition.germinatedSeeds).toList();
-
-    //calcularGerminadasPorRepeticao(widget.lot.dailyCount);
-
-    for (var element in widget.lot.dailyCount.values) {
-      widget.lot.germinatedSeedPerLot += element!.reduce((a, b) => a + b);
-    }
-
-    await lotRepository.updateLot(widget.lot);
-  }*/
-
   Future<void> saveGerminationSeedsLot(List<Repetition> listRepetition) async {
-    widget.lot.dailyCount[widget.germinationTest.currentDay] = listRepetition.map((repetition) => repetition.germinatedSeeds).toList();
-    debugPrint("DAILYCOUNT DO LOTE: ${widget.lot.numberLot}: ${widget.lot.dailyCount[widget.germinationTest.currentDay]}");
-    widget.lot.germinatedSeedPerLot = listRepetition.fold(0, (sum, repetition) => sum + repetition.germinatedSeeds);
+    widget.lot.dailyCount[currentDay] =
+        listRepetition.map((repetition) => repetition.germinatedSeeds).toList();
+    debugPrint("DAILYCOUNT DO LOTE: ${widget.lot.numberLot}: $currentDay");
+    widget.lot.germinatedSeedPerLot = listRepetition.fold(
+        0, (sum, repetition) => sum + repetition.germinatedSeeds);
 
     await lotRepository.updateLot(widget.lot);
   }
@@ -174,7 +274,8 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
     // Busca todos os lotes associados ao teste
     final lots = await lotRepository.getAllLots(widget.germinationTest.id);
 
-    final totalGerminatedSeeds = lots.fold<int>(0, (sum, lot) => sum + lot.germinatedSeedPerLot);
+    final totalGerminatedSeeds =
+        lots.fold<int>(0, (sum, lot) => sum + lot.germinatedSeedPerLot);
 
     widget.germinationTest.germinatedSeeds = totalGerminatedSeeds;
     await testRepository.updateGerminationTest(widget.germinationTest);

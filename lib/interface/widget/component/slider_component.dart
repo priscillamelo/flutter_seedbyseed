@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 class SliderComponent extends StatefulWidget {
-  final int valueStart;
-  final int valueMax;
-  final Function(double) totalGerminatedSeeds;
+  final double valueStart;
+  final double valueMax;
+  final bool enabledSlider;
+  final void Function(double) totalGerminatedSeeds;
 
   const SliderComponent({
     super.key,
     required this.valueStart,
     required this.valueMax,
     required this.totalGerminatedSeeds,
+    required this.enabledSlider,
   });
 
   @override
@@ -25,14 +27,14 @@ class _SliderComponentState extends State<SliderComponent> {
     super.initState();
     //debugPrint("Valor inicial: ${widget.valueStart}");
     // Inicializa o valor com o valor inicial vindo do widget
-    valueGerminationSeed = widget.valueStart.toDouble();
-    valueMax = widget.valueMax.toDouble();
+    valueGerminationSeed = widget.valueStart;
+    valueMax = widget.valueMax;
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    bool isEnabled = valueMax > 0.0;
+    bool isEnabled = widget.enabledSlider;
 
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
@@ -55,10 +57,10 @@ class _SliderComponentState extends State<SliderComponent> {
       ),
       child: Slider(
         value: valueGerminationSeed,
-        min: 0.0,
+        min: isEnabled ? 0.0 : valueMax,
         max: valueMax,
         label: "${valueGerminationSeed.toInt()}",
-        divisions: isEnabled ? valueMax.toInt() : 0,
+        divisions: valueMax.toInt(),
         onChanged: isEnabled
             ? (value) {
                 setState(() {

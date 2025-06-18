@@ -8,8 +8,7 @@ class FloatingButtonLargeComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     return FloatingActionButton.large(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-      onPressed: () =>
-          Navigator.pushNamed(context, PageRoutes.kADD_GERMINATIONTEST),
+      onPressed: () => Navigator.pushNamed(context, PageRoutes.kADD_GERMINATIONTEST),
       child: const Icon(
         Icons.add,
         size: 64,

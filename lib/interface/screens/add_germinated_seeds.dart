@@ -7,26 +7,31 @@ class AddGerminatedSeeds extends StatefulWidget {
   const AddGerminatedSeeds({super.key});
 
   @override
-  State<AddGerminatedSeeds> createState() => _AddSeedGerminationState();
+  State<AddGerminatedSeeds> createState() => _AddGerminatedSeedsState();
 }
 
-class _AddSeedGerminationState extends State<AddGerminatedSeeds> {
+class _AddGerminatedSeedsState extends State<AddGerminatedSeeds> {
   late GerminationTest germinationTest;
   late bool isAvailableDayCount;
   late Future<void> _initFuture;
+
+  bool _isInitialized = false;
   bool isNewDay = false;
 
   @override
-  void initState() {
-    super.initState();
-    _initFuture = _init(); // Inicia a verificação logo no início
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      germinationTest =
+          ModalRoute.of(context)!.settings.arguments as GerminationTest;
+      _initFuture = _init();
+      _isInitialized = true;
+    }
   }
 
   Future<void> _init() async {
-    await Future.delayed(Duration.zero); // Garante acesso ao contexto
+    await Future<void>.delayed(Duration.zero); // Garante acesso ao contexto
     if (!mounted) return;
-    germinationTest =
-        ModalRoute.of(context)!.settings.arguments as GerminationTest;
     isNewDay = await VerifyDate.loadAndCompareDate(DateTime.now());
 
     isAvailableDayCount = germinationTest.verifyIsFirstCountAvailable();
@@ -46,22 +51,26 @@ class _AddSeedGerminationState extends State<AddGerminatedSeeds> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erro ao carregar: ${snapshot.error}'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.red, size: 40),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Erro ao carregar os dados.\n${snapshot.error}',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            );
           }
 
-            if (isAvailableDayCount) {
-              return LotFutureBuilder(
-                germinationTest: germinationTest,
-                isNewDay: isNewDay,
-              );
-            } else {
-              final firstCountDate = germinationTest.calculateFirstCountDate();
-              final String formattedDate =
-                  "${firstCountDate.day}/${firstCountDate.month}/${firstCountDate.year}";
-              return Text(
-                  "A contagem das sementes se inicia no dia $formattedDate");
-            }
-
+          return LotFutureBuilder(
+            germinationTest: germinationTest,
+            isNewDay: isNewDay,
+          );
         },
       ),
     );

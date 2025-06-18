@@ -1,4 +1,6 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_seedbyseed/infra/config/notification_local_service.dart';
 import 'package:flutter_seedbyseed/interface/widget/component/dropdown_button_component.dart';
 import 'package:flutter_seedbyseed/interface/widget/component/text_form_field_component.dart';
 import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
@@ -8,24 +10,56 @@ import 'package:flutter_seedbyseed/persistence/repository/germination_test_repos
 import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
 import 'package:flutter_seedbyseed/persistence/repository/repetition_repository.dart';
 import 'package:flutter_seedbyseed/domain/verify_date.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
-class AddGerminationTest extends StatelessWidget {
+class AddGerminationTest extends StatefulWidget {
   const AddGerminationTest({super.key});
+
+  @override
+  State<AddGerminationTest> createState() => _AddGerminationTestState();
+}
+
+class _AddGerminationTestState extends State<AddGerminationTest> {
+  bool _isActiveNotification = true;
+
+  bool getStatusNotification() {
+    return _isActiveNotification;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Teste de Germinação"),
+        title: const AutoSizeText(
+          "Cadastro de Teste de Germinação",
+          maxLines: 1,
+          minFontSize: 10,
+          style: TextStyle(fontSize: 24),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(_isActiveNotification
+                ? Icons.notifications_active
+                : Icons.notifications_off),
+            onPressed: () {
+              setState(() {
+                _isActiveNotification = !_isActiveNotification;
+              });
+            },
+          ),
+        ],
       ),
-      body: const FormAddWidget(),
+      body: FormAddWidget(
+        statusNotification: getStatusNotification(),
+      ),
     );
   }
 }
 
 class FormAddWidget extends StatefulWidget {
-  const FormAddWidget({super.key});
+  final bool statusNotification;
+  const FormAddWidget({super.key, required this.statusNotification});
 
   @override
   State<FormAddWidget> createState() => _FormCustomWidgetState();
@@ -38,9 +72,6 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
   final _formKey = GlobalKey<FormState>();
 
   final _especieController = TextEditingController();
-
-  //final _responsavelController = TextEditingController();
-  //final _duracaoController = TextEditingController(text: '0');
   final _loteController = TextEditingController();
   final _repeticaoController = TextEditingController();
   final _sementesRepeticaoController = TextEditingController();
@@ -49,7 +80,26 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
   final _contagemFinalController = TextEditingController();
   late String materialUsed = "";
   late String substrateUsed = "";
-  late List<Lot> listLot;
+
+  Widget _buildSection(String title, List<Widget> children) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,181 +114,266 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
+              // Adicionado mais preenchimento para um respiro nas bordas
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.start,
+                  // Alinha os elementos à esquerda (padrão para preenchimento de formulário)
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TextFormFieldComponent(
-                      controller: _especieController,
-                      textLabel: "Espécie",
-                      textInputType: TextInputType.text,
-                      suffixText: "",
-                    ),
-                    /* TextFormFieldComponent(
-                    controller: _responsavelController,
-                    textLabel: "Responsável",
-                    textInputType: TextInputType.text,
-                    suffixText: null,
-                  ), */
-                    /* TextFormFieldComponent(
-                      controller: _duracaoController,
-                      textLabel: "Duração",
-                      textInputType: TextInputType.number,
-                      suffixText: "Dias",
-                    ), */
-                    TextFormFieldComponent(
-                      controller: _loteController,
-                      textLabel: "Lote",
-                      textInputType: TextInputType.number,
-                      suffixText: "",
-                    ),
-                    TextFormFieldComponent(
-                      controller: _repeticaoController,
-                      textLabel: "Repetição",
-                      textInputType: TextInputType.number,
-                      suffixText: "Por Lote",
-                    ),
-                    TextFormFieldComponent(
-                      controller: _sementesRepeticaoController,
-                      textLabel: "Sementes",
-                      textInputType: TextInputType.number,
-                      suffixText: "Por Repetição",
-                    ),
-                    TextFormFieldComponent(
-                      controller: _temperaturaController,
-                      textLabel: "Temperatura",
-                      textInputType: TextInputType.text,
-                      /* .numberWithOptions(
-                      signed: true,
-                      decimal: true,
-                    ), */
-                      suffixText: "ºC",
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 8),
+                    _buildSection("Identificação", [
+                      TextFormFieldComponent(
+                        controller: _especieController,
+                        textLabel: "Espécie",
+                        textInputType: TextInputType.text,
+                        icon: Icons.eco_outlined,
+                      ),
+                      // Espaçamento entre campos
+                    ]),
+
+                    _buildSection("Especificações", [
+                      TextFormFieldComponent(
+                        controller: _loteController,
+                        textLabel: "Lotes",
+                        textInputType: TextInputType.number,
+                        icon: FontAwesomeIcons.boxesStacked,
+                      ),
+                      TextFormFieldComponent(
+                        controller: _repeticaoController,
+                        textLabel: "Repetições por lote",
+                        textInputType: TextInputType.number,
+                        icon: Icons.repeat,
+                      ),
+                      // Espaçamento entre campos
+                      TextFormFieldComponent(
+                        controller: _sementesRepeticaoController,
+                        textLabel: "Sementes por repetição",
+                        textInputType: TextInputType.number,
+                        icon: Icons.grain_outlined,
+                      ),
+                      // Espaçamento entre campos
+                      TextFormFieldComponent(
+                        controller: _temperaturaController,
+                        textLabel: "Temperatura (ºC)",
+                        textInputType: TextInputType.numberWithOptions(
+                          signed: true,
+                          decimal: true,
+                        ),
+                        icon: Icons.thermostat_outlined,
+                      ),
+                    ]),
+
+                    _buildSection("Contagens", [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
                             child: TextFormFieldComponent(
                               controller: _contagemInicialController,
                               textLabel: "Contagem Inicial",
                               textInputType: TextInputType.number,
-                              suffixText: "",
+                              icon: FontAwesomeIcons.hourglassStart,
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 8),
+                          const SizedBox(width: 16), // Espaçamento horizontal
+                          Expanded(
                             child: TextFormFieldComponent(
                               controller: _contagemFinalController,
                               textLabel: "Contagem Final",
                               textInputType: TextInputType.number,
-                              suffixText: "",
+                              icon: FontAwesomeIcons.hourglassEnd,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 16,
-                    ),
-                    DropdownButtonComponent(
-                      typeEnum: 'Material',
-                      selectedMaterialOrSubstrate: (material) {
-                        setState(() {
-                          materialUsed = material;
-                        });
-                      },
-                    ),
-                    DropdownButtonComponent(
-                      typeEnum: 'Substrate',
-                      selectedMaterialOrSubstrate: (substrate) {
-                        setState(() {
-                          substrateUsed = substrate;
-                        });
-                      },
-                    ),
-                    Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text(
-                          "Cancelar",
-                          style: TextStyle(
-                            fontSize: 24,
-                          ),
-                        ),
+                        ],
                       ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            final DateTime createdDate = VerifyDate.normalizeDayMonth(DateTime.now());
-                            GerminationTest germinationTest = GerminationTest(
-                              species: _especieController.text,
-                              materialUsed: materialUsed,
-                              substratoUsed: substrateUsed,
-                              temperature: _temperaturaController.text,
-                              createdAt: createdDate.toString(),
-                              firstCount: int.parse(_contagemInicialController.text),
-                              lastCount: int.parse(_contagemFinalController.text),
-                              totalSeeds:
-                                  int.parse(_repeticaoController.text) * int.parse(_sementesRepeticaoController.text),
-                            );
+                    ]),
 
-                            int days = germinationTest.lastCount - germinationTest.firstCount;
-
-                            Future<int> idFuture = testRepository.addGerminationTest(germinationTest);
-                            int idGerminationTest = await idFuture;
-
-                            listLot = List<Lot>.generate(int.parse(_loteController.text), (index) {
-                              return Lot(idGerminationTest: idGerminationTest, numberLot: index + 1, dailyCount: {
-                                for (int i = 1; i <= days; i++)
-                                  i: List<int>.filled(int.parse(_repeticaoController.text), 0),
-                              });
-                            });
-
-                            List<int> listIdLot = [];
-
-                            for (var lot in listLot) {
-                              idFuture = lotRepository.addLot(lot);
-                              int id = await idFuture;
-                              listIdLot.add(id);
-                            }
-
-                            int repetitionCount = int.parse(_repeticaoController.text);
-
-                            for (int i = 0; i < listIdLot.length; i++) {
-                              for (int j = 0; j < repetitionCount; j++) {
-                                Repetition repetition = Repetition(
-                                    lotId: listIdLot[i], seedsTotal: int.parse(_sementesRepeticaoController.text));
-                                repetitionRepository.addRepetition(repetition);
-                              }
-                            }
-
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('${germinationTest.species} cadastrado!')),
-                              );
-
-                              Navigator.pop(context);
-                            }
-                          }
+                    _buildSection("Materiais", [
+                      DropdownButtonComponent(
+                        typeEnum: 'Material',
+                        selectedMaterialOrSubstrate: (material) {
+                          setState(() {
+                            materialUsed = material;
+                          });
                         },
-                        child: const Text(
-                          "Cadastrar Teste",
-                          style: TextStyle(
-                            fontSize: 24,
-                          ),
-                        ),
                       ),
-                    ])
+                      DropdownButtonComponent(
+                        typeEnum: 'Substrate',
+                        selectedMaterialOrSubstrate: (substrate) {
+                          setState(() {
+                            substrateUsed = substrate;
+                          });
+                        },
+                      ),
+                    ]),
+
+                    const SizedBox(height: 32), // Mais espaço antes dos botões
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Colors.transparent, // Fundo transparente
+                                shadowColor: Colors.transparent, // Sem sombra
+                                // Define a cor do texto para a cor primária do tema
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                side: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary, // Borda na cor primária
+                                  width: 1,
+                                ),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: const Text(
+                                "Cancelar",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                              width: 16), // Espaçamento entre os botões
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  GerminationTest germinationTest =
+                                      _instantiateGerminationTest();
+
+                                  germinationTest.id = await testRepository
+                                      .addGerminationTest(germinationTest);
+
+                                  final listIdLot = await _instantiateLots(
+                                      germinationTest.id);
+
+                                  await _instantiateRepetitions(listIdLot);
+
+                                  if (widget.statusNotification) {
+                                    await _scheduleNotification(
+                                        germinationTest);
+                                  }
+
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          backgroundColor: Colors.green,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          content: Text(
+                                              '${germinationTest.species} cadastrado!')),
+                                    );
+
+                                    Navigator.pop(context);
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                // Estilo para o botão "Cadastrar Teste" - Mais proeminente
+                                // A cor de fundo será a cor primária do seu tema (Colors.blueGrey)
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                // A cor do texto será a cor "onPrimary" do seu tema, que contrasta com a cor primária
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.onPrimary,
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                              ),
+                              child: Text(
+                                "Cadastrar Teste",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ])
                   ]),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  GerminationTest _instantiateGerminationTest() {
+    final createdDate = VerifyDate.normalizeDayMonth(DateTime.now());
+
+    return GerminationTest(
+      species: _especieController.text,
+      materialUsed: materialUsed,
+      substratoUsed: substrateUsed,
+      temperature: _temperaturaController.text,
+      createdAt: createdDate,
+      firstCount: int.parse(_contagemInicialController.text),
+      lastCount: int.parse(_contagemFinalController.text),
+      totalSeeds: int.parse(_repeticaoController.text) *
+          int.parse(_sementesRepeticaoController.text),
+    );
+  }
+
+  Future<List<int>> _instantiateLots(int idGerminationTest) async {
+    final int days = int.parse(_contagemFinalController.text) -
+        int.parse(_contagemInicialController.text) +
+        1; // Total de dias entre a contagem inicial e final
+
+    final int repetitionCount = int.parse(_repeticaoController.text);
+    final int loteCount = int.parse(_loteController.text);
+
+    final List<Lot> lots = List.generate(loteCount, (index) {
+      return Lot(
+        idGerminationTest: idGerminationTest,
+        numberLot: index + 1,
+        dailyCount: {
+          for (int i = 1; i <= days; i++)
+            i: List<int>.filled(repetitionCount, 0),
+        },
+      );
+    });
+
+    List<int> lotIds = [];
+    for (final lot in lots) {
+      final id = await lotRepository.addLot(lot);
+      lotIds.add(id);
+    }
+
+    return lotIds;
+  }
+
+  Future<void> _instantiateRepetitions(List<int> lotIds) async {
+    final int repetitionCount = int.parse(_repeticaoController.text);
+    final int seedsPerRepetition = int.parse(_sementesRepeticaoController.text);
+
+    for (final lotId in lotIds) {
+      for (int i = 0; i < repetitionCount; i++) {
+        final repetition = Repetition(
+          lotId: lotId,
+          seedsTotal: seedsPerRepetition,
+        );
+        await repetitionRepository.addRepetition(repetition);
+      }
+    }
+  }
+
+  Future<void> _scheduleNotification(GerminationTest test) async {
+    await NotificationLocalService().requestExactAlarmPermission(context);
+    final DateTime firstCountDate = test.calculateCountDate(test.firstCount);
+
+    await NotificationLocalService().scheduleGerminationNotification(
+      testId: test.id,
+      date: firstCountDate,
+      seedName: test.species,
     );
   }
 }

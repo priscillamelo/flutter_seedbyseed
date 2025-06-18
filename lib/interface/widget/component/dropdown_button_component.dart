@@ -71,12 +71,12 @@ class _DropdownButtonComponentState extends State<DropdownButtonComponent> {
             ? Padding(
                 padding: const EdgeInsets.only(bottom: 32),
                 child: TextFormFieldComponent(
-                    textLabel: typeEnum == 'Material'
-                        ? 'Digite o material'
-                        : 'Digite o substrato',
-                    controller: otherMaterial,
-                    textInputType: TextInputType.text,
-                    suffixText: ""),
+                  textLabel: typeEnum == 'Material'
+                      ? 'Digite o material'
+                      : 'Digite o substrato',
+                  controller: otherMaterial,
+                  textInputType: TextInputType.text,
+                ),
               )
             : Container(),
       ],
