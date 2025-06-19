@@ -58,7 +58,13 @@ class GerminationTest {
         DateFormat('dd/MM/yyyy', 'pt_BR').parse(createdAt);
     final int difference = calculateDifferenceDays(createdAtDate);
 
+    debugPrint(
+        "Diferença de dias entre hoje e a data da primeira contagem: $difference");
+
     currentDay = difference + 1;
+
+    debugPrint(
+        "Dia atual atualizado: $currentDay, com base na data da primeira contagem: $firstCountDate");
   }
 
   // Verfica se hoje é o dia da primeira contagem

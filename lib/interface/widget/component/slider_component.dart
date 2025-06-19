@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class SliderComponent extends StatefulWidget {
   final double valueStart;
   final double valueMax;
-  final bool enabledSlider;
   final void Function(double) totalGerminatedSeeds;
 
   const SliderComponent({
@@ -11,7 +10,6 @@ class SliderComponent extends StatefulWidget {
     required this.valueStart,
     required this.valueMax,
     required this.totalGerminatedSeeds,
-    required this.enabledSlider,
   });
 
   @override
@@ -34,19 +32,13 @@ class _SliderComponentState extends State<SliderComponent> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    bool isEnabled = widget.enabledSlider;
+    bool isEnabled = valueMax > 0.0;
 
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
-        activeTrackColor: isEnabled
-            ? colorScheme.primary
-            : colorScheme.onSurface.withValues(alpha: 0.3),
-        inactiveTrackColor: isEnabled
-            ? colorScheme.primary.withValues(alpha: 0.3)
-            : colorScheme.onSurface.withValues(alpha: 0.1),
-        thumbColor: isEnabled
-            ? colorScheme.primary
-            : colorScheme.onSurface.withValues(alpha: 0.4),
+        activeTrackColor: isEnabled ? colorScheme.primary : colorScheme.onSurface.withValues(alpha: 0.3),
+        inactiveTrackColor: isEnabled ? colorScheme.primary.withValues(alpha: 0.3) : colorScheme.onSurface.withValues(alpha: 0.1),
+        thumbColor: isEnabled ? colorScheme.primary : colorScheme.onSurface.withValues(alpha: 0.4),
         trackHeight: 4.0,
         overlayColor: colorScheme.primary.withAlpha(32),
         valueIndicatorColor: colorScheme.primary,
@@ -57,10 +49,10 @@ class _SliderComponentState extends State<SliderComponent> {
       ),
       child: Slider(
         value: valueGerminationSeed,
-        min: isEnabled ? 0.0 : valueMax,
+        min: 0.0,
         max: valueMax,
         label: "${valueGerminationSeed.toInt()}",
-        divisions: valueMax.toInt(),
+        divisions: isEnabled ? valueMax.toInt() : 0,
         onChanged: isEnabled
             ? (value) {
                 setState(() {

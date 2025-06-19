@@ -37,7 +37,6 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
   List<int> listGerminatedSeeds = [];
   bool hasChanges = false;
   late int differenceDays;
-  int currentDay = 1;
   late DateTime firstCount;
 
   @override
@@ -48,10 +47,6 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
     firstCount = widget.germinationTest
         .calculateCountDate(widget.germinationTest.firstCount);
     debugPrint("First Count Date: $firstCount");
-    differenceDays = widget.germinationTest.calculateDifferenceDays(widget
-        .germinationTest
-        .calculateCountDate(widget.germinationTest.firstCount));
-    currentDay = differenceDays + 1;
   }
 
   @override
@@ -62,14 +57,15 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
         future: listRepetition,
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            debugPrint("Lista de Sementes Germinadas: ${listGerminatedSeeds}");
+
             if (listGerminatedSeeds.isEmpty) {
-              debugPrint("DIFFERENCE DAYS: $differenceDays");
               debugPrint("DAILYCOUNT: ${widget.lot.dailyCount}");
-              debugPrint("CURRENTDAY: $currentDay");
+              debugPrint("CURRENTDAY: ${widget.germinationTest.currentDay}");
               debugPrint(
-                  "DAILYCOUNT (CurrentDay): ${widget.lot.dailyCount[currentDay]}");
-              listGerminatedSeeds =
-                  List.from(widget.lot.dailyCount[currentDay]!);
+                  "DAILYCOUNT (CurrentDay): ${widget.lot.dailyCount[widget.germinationTest.currentDay]}");
+              listGerminatedSeeds = List.from(
+                  widget.lot.dailyCount[widget.germinationTest.currentDay]!);
             }
             return Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -81,8 +77,7 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
                         Repetition repetition = snapshot.data![index];
-                        bool enabledSlider =
-                            repetition.germinatedSeeds == repetition.seedsTotal;
+                        //bool enabledSlider = repetition.germinatedSeeds == repetition.seedsTotal;
 
                         return Card(
                           margin: const EdgeInsets.only(bottom: 16),
@@ -122,7 +117,6 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
                                           },
                                           valueStart: listGerminatedSeeds[index]
                                               .toDouble(),
-                                          enabledSlider: enabledSlider,
                                         ),
                                       ),
                                       const SizedBox(width: 8),
@@ -174,7 +168,7 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
                               ),
                             );
                             await saveGerminationSeedsRepetition(
-                                snapshot.data!, listGerminatedSeeds);
+                                snapshot.data!);
                             await saveGerminationSeedsLot(snapshot.data!);
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -193,10 +187,10 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
                             debugPrint(
                                 "Lista de Sementes Germinadas -> $listGerminatedSeeds");
 
-                            int daysOfCount = widget.germinationTest.lastCount -
-                                widget.germinationTest.firstCount;
+                            int daysOfCount = widget.germinationTest.lastCount;
 
-                            bool lastDay = currentDay == (daysOfCount + 1);
+                            bool lastDay = (widget.germinationTest.currentDay ==
+                                daysOfCount);
 
                             // verifica se é o último dia do teste de germinação para poder realizar o cálculo do IVG do Lote e mudar o status do teste para finalizado
                             if (lastDay) {
@@ -243,7 +237,7 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
   }
 
   Future<void> saveGerminationSeedsRepetition(
-      List<Repetition> listRepetition, List<int> listGerminatedSeeds) async {
+      List<Repetition> listRepetition) async {
     for (int i = 0; i < listRepetition.length; i++) {
       if (widget.isNewDay) {
         listRepetition[i].germinatedSeeds += listGerminatedSeeds[i];
@@ -261,9 +255,11 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
   }
 
   Future<void> saveGerminationSeedsLot(List<Repetition> listRepetition) async {
-    widget.lot.dailyCount[currentDay] =
-        listRepetition.map((repetition) => repetition.germinatedSeeds).toList();
-    debugPrint("DAILYCOUNT DO LOTE: ${widget.lot.numberLot}: $currentDay");
+    listGerminatedSeeds;
+    widget.lot.dailyCount[widget.germinationTest.currentDay] =
+        listGerminatedSeeds;
+    debugPrint(
+        "DAILYCOUNT DO LOTE: ${widget.lot.numberLot}: ${widget.lot.dailyCount[widget.germinationTest.currentDay]}");
     widget.lot.germinatedSeedPerLot = listRepetition.fold(
         0, (sum, repetition) => sum + repetition.germinatedSeeds);
 

@@ -324,10 +324,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
   }
 
   Future<List<int>> _instantiateLots(int idGerminationTest) async {
-    final int days = int.parse(_contagemFinalController.text) -
-        int.parse(_contagemInicialController.text) +
-        1; // Total de dias entre a contagem inicial e final
-
+    final int days = int.parse(_contagemFinalController.text);
     final int repetitionCount = int.parse(_repeticaoController.text);
     final int loteCount = int.parse(_loteController.text);
 
