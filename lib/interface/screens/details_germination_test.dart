@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_seedbyseed/domain/export_excel.dart';
 import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
 import 'package:flutter_seedbyseed/domain/model/lot.dart';
+import 'package:flutter_seedbyseed/infra/config/export_excel.dart';
 import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -68,54 +68,65 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           final lot = snapshot.data![index];
-                          return ListTile(
-                            title: Badge(
-                              label: Text("Dados do Lote ${lot.numberLot}"),
-                              child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                        "IVG de cada Repetição: ${lot.ivgPerLot}"),
-                                    Text(
-                                        "Tempo Médio de IVG : ${lot.averageIVG}"),
-                                    FutureBuilder<List<double>>(
-                                      future: lot
-                                          .calculatePercGerminatedSeedsPerRepetition(),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const Text(
-                                              "Carregando porcentagem por repetição...");
-                                        } else if (snapshot.hasError) {
-                                          return Text(
-                                              "Erro: ${snapshot.error}");
-                                        } else {
-                                          return Text(
-                                            "Percentual de sementes germinadas de cada Repetição: ${snapshot.data!.map((e) => e.toStringAsFixed(2)).join(', ')}%",
-                                          );
-                                        }
-                                      },
-                                    ),
-                                    FutureBuilder<double>(
-                                      future: lot
-                                          .calculatePercAverageGerminatedSeeds(),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return const Text(
-                                              "Carregando média de germinação...");
-                                        } else if (snapshot.hasError) {
-                                          return Text(
-                                              "Erro: ${snapshot.error}");
-                                        } else {
-                                          return Text(
-                                            "Média do percentual de sementes germinadas: ${snapshot.data!.toStringAsFixed(2)}%",
-                                          );
-                                        }
-                                      },
-                                    ),
-                                  ]),
-                            ),
+                          return Column(
+                            children: [
+                              Chip(
+                                  label:
+                                      Text("Dados do Lote ${lot.numberLot}")),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              "IVG de cada Repetição: ${lot.ivgPerLot}"),
+                                          Text(
+                                              "Tempo Médio de IVG : ${lot.averageIVG}"),
+                                          FutureBuilder<List<double>>(
+                                            future: lot
+                                                .calculatePercGerminatedSeedsPerRepetition(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Text(
+                                                    "Carregando porcentagem por repetição...");
+                                              } else if (snapshot.hasError) {
+                                                return Text(
+                                                    "Erro: ${snapshot.error}");
+                                              } else {
+                                                return Text(
+                                                  "Percentual de sementes germinadas de cada Repetição: ${snapshot.data!.map((e) => e.toStringAsFixed(2)).join(', ')}%",
+                                                );
+                                              }
+                                            },
+                                          ),
+                                          FutureBuilder<double>(
+                                            future: lot
+                                                .calculatePercAverageGerminatedSeeds(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return const Text(
+                                                    "Carregando média de germinação...");
+                                              } else if (snapshot.hasError) {
+                                                return Text(
+                                                    "Erro: ${snapshot.error}");
+                                              } else {
+                                                return Text(
+                                                  "Média do percentual de sementes germinadas: ${snapshot.data!.toStringAsFixed(2)}%",
+                                                );
+                                              }
+                                            },
+                                          ),
+                                        ]),
+                                  ),
+                                ),
+                              )
+                            ],
                           );
                         })
                   ]),
@@ -127,8 +138,7 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         onPressed: () async {
           List<Lot> listLot = await futureListLot;
-          //TODO: CRIAR A FUNÇÃO DE EXPORTAR O TESTE DE GERMINAÇÃO EM .CSV
-          exportarExcel(listLot);
+          if (context.mounted) await lidarComExportacao(context, listLot);
         },
         child: Icon(
           FontAwesomeIcons.fileExcel,

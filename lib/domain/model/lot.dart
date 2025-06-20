@@ -51,6 +51,7 @@ class Lot {
     }
 
     averageIVG = calculateAverageIVG();
+    debugPrint("IVG Per Lote: $ivgPerLot");
     debugPrint("IVG MEDIO DO LOTE $numberLot: $averageIVG");
   }
 
@@ -103,13 +104,9 @@ class Lot {
         // Adiciona o número de sementes germinadas à lista
         listGerminatedSeeds.add(repetition.germinatedSeeds);
         // Calcula o percentual de sementes germinadas para cada repetição
-        debugPrint(
-            "Sementes germinadas na repetição ${repetition.id}: ${repetition.germinatedSeeds}");
         double perc =
             (repetition.germinatedSeeds / repetition.seedsTotal) * 100;
         percGerminatedSeeds.add(perc);
-        debugPrint(
-            "Percentual de sementes germinadas na repetição ${repetition.id}: $perc%");
       }
     }
 

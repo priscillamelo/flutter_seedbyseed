@@ -1,7 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
-import 'package:flutter_seedbyseed/domain/verify_date.dart';
+import 'package:flutter_seedbyseed/infra/config/verify_date.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class GerminationTestCard extends StatelessWidget {

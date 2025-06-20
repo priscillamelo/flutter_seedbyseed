@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/interface/widget/lot_future_builder.dart';
 import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
-import 'package:flutter_seedbyseed/domain/verify_date.dart';
+import 'package:flutter_seedbyseed/infra/config/verify_date.dart';
 
 class AddGerminatedSeeds extends StatefulWidget {
   const AddGerminatedSeeds({super.key});

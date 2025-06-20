@@ -9,7 +9,7 @@ import 'package:flutter_seedbyseed/domain/model/repetition.dart';
 import 'package:flutter_seedbyseed/persistence/repository/germination_test_repository.dart';
 import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
 import 'package:flutter_seedbyseed/persistence/repository/repetition_repository.dart';
-import 'package:flutter_seedbyseed/domain/verify_date.dart';
+import 'package:flutter_seedbyseed/infra/config/verify_date.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
