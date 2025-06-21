@@ -123,7 +123,7 @@ class _ProgressTabState extends State<ProgressTab> {
               iconColor: Colors.red,
               onTap: () {
                 Navigator.pop(context);
-                _confirmDeleteTest(context, test.id);
+                _confirmDeleteTest(context, test.id!);
               },
             ),
           ],
@@ -163,17 +163,18 @@ class _ProgressTabState extends State<ProgressTab> {
           );
         }
 
-        await NotificationLocalService().cancelGerminationNotification(test.id);
+        await NotificationLocalService()
+            .cancelGerminationNotification(test.id!);
       },
     );
   }
 
   Future<void> finishTest(GerminationTest test) async {
-    listLot = await lotRepository.getAllLots(test.id);
+    listLot = await lotRepository.getAllLots(test.id!);
     for (var lot in listLot) {
       lot.calculateIVGPerLot();
       await lot.calculatePercAverageGerminatedSeeds();
-      await lot.totalGerminatedSeedPerLot();
+      await lot.calculateTotalGerminatedSeedPerLot();
 
       await lotRepository.updateLot(lot);
       debugPrint(

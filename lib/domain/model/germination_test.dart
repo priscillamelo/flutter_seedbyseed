@@ -9,20 +9,21 @@ class GerminationTest {
   static const inProgress = 'in_progress';
   static const finished = 'finished';
 
-  late int id;
-  late String species;
-  late String materialUsed;
-  late String substratoUsed;
-  late String temperature;
-  late int firstCount;
-  late int lastCount;
-  late int totalSeeds;
-  late final String createdAt;
+  int? id;
+  final String species;
+  final String materialUsed;
+  final String substratoUsed;
+  final String temperature;
+  final int firstCount;
+  final int lastCount;
+  final int totalSeeds;
+  final String createdAt;
   int germinatedSeeds = 0;
   int currentDay = 0;
   String status = StatusGerminationTest.inProgress.statusValue;
 
   GerminationTest({
+    this.id,
     required this.species,
     required this.materialUsed,
     required this.substratoUsed,
@@ -114,20 +115,19 @@ class GerminationTest {
     };
   }
 
-  GerminationTest.fromMap(Map map) {
-    id = map[GerminationTestConst.kIDGERMINATIONTESTCOLUMN];
-    species = map[GerminationTestConst.kSPECIESCOLUMN];
-    materialUsed = map[GerminationTestConst.kMATERIALCOLUMN];
-    substratoUsed = map[GerminationTestConst.kSUBSTRATECOLUMN];
-    temperature = map[GerminationTestConst.kTEMPERATURECOLUMN];
-    createdAt = map[GerminationTestConst.kCREATEATCOLUMN];
-    firstCount = map[GerminationTestConst.kFIRSTCOUNTCOLUMN];
-    lastCount = map[GerminationTestConst.kLASTCOUNTCOLUMN];
-    totalSeeds = map[GerminationTestConst.kTOTALSEEDSCOLUMN];
-    germinatedSeeds = map[GerminationTestConst.kGERMINATEDSEEDSCOLUMN];
-    currentDay = map[GerminationTestConst.kCURRENTDAYCOLUMN];
-    status = map[GerminationTestConst.kSTATUSCOLUMN];
-  }
+  GerminationTest.fromMap(Map map)
+      : id = map[GerminationTestConst.kIDGERMINATIONTESTCOLUMN],
+        species = map[GerminationTestConst.kSPECIESCOLUMN],
+        materialUsed = map[GerminationTestConst.kMATERIALCOLUMN],
+        substratoUsed = map[GerminationTestConst.kSUBSTRATECOLUMN],
+        temperature = map[GerminationTestConst.kTEMPERATURECOLUMN],
+        createdAt = map[GerminationTestConst.kCREATEATCOLUMN],
+        firstCount = map[GerminationTestConst.kFIRSTCOUNTCOLUMN],
+        lastCount = map[GerminationTestConst.kLASTCOUNTCOLUMN],
+        totalSeeds = map[GerminationTestConst.kTOTALSEEDSCOLUMN],
+        germinatedSeeds = map[GerminationTestConst.kGERMINATEDSEEDSCOLUMN],
+        currentDay = map[GerminationTestConst.kCURRENTDAYCOLUMN],
+        status = map[GerminationTestConst.kSTATUSCOLUMN];
 
 /* Future<void> totalGerminatedSeed(int idGerminationTest) async {
     // List<int> listTotalGerminationSeeds = [];

@@ -9,7 +9,8 @@ class DatabaseApp {
 
   static const String _kDATABASENAME = 'germination_test_db.db';
 
-  static final DatabaseApp instanceDatabaseApp = DatabaseApp._internalConstructor();
+  static final DatabaseApp instanceDatabaseApp =
+      DatabaseApp._internalConstructor();
 
   static Database? database;
 
@@ -59,6 +60,7 @@ CREATE TABLE ${GerminationTestConst.kGERMINATIONTESTTABLE} (
 CREATE TABLE ${LotConst.kLOTTABLE} (
   ${LotConst.kIDLOTCOLUMN} INTEGER PRIMARY KEY AUTOINCREMENT,
   ${LotConst.kNUMBERLOTCOLUMN} INTEGER NOT NULL,
+  ${LotConst.kTOTALSEEDPERLOT} INTEGER NOT NULL,
   ${LotConst.kGERMINATEDSEEDPERLOT} INTEGER NOT NULL,
   ${LotConst.kDAILYCOUNTCOLUMN} TEXT NOT NULL,
   ${LotConst.kIVGPERLOTCOLUMN} REAL NOT NULL,

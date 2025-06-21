@@ -252,10 +252,11 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                   germinationTest.id = await testRepository
                                       .addGerminationTest(germinationTest);
 
-                                  final listIdLot = await _instantiateLots(
-                                      germinationTest.id);
-
-                                  await _instantiateRepetitions(listIdLot);
+                                  if (germinationTest.id != null) {
+                                    final listIdLot = await _instantiateLots(
+                                        germinationTest.id!);
+                                    await _instantiateRepetitions(listIdLot);
+                                  }
 
                                   if (widget.statusNotification) {
                                     await _scheduleNotification(
@@ -310,6 +311,13 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
   GerminationTest _instantiateGerminationTest() {
     final createdDate = VerifyDate.normalizeDayMonth(DateTime.now());
 
+    final int repetitionCount = int.parse(_repeticaoController.text);
+    final int loteCount = int.parse(_loteController.text);
+
+    final totalSeedsTest =
+        (int.parse(_sementesRepeticaoController.text) * repetitionCount) *
+            loteCount;
+
     return GerminationTest(
       species: _especieController.text,
       materialUsed: materialUsed,
@@ -318,8 +326,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
       createdAt: createdDate,
       firstCount: int.parse(_contagemInicialController.text),
       lastCount: int.parse(_contagemFinalController.text),
-      totalSeeds: int.parse(_repeticaoController.text) *
-          int.parse(_sementesRepeticaoController.text),
+      totalSeeds: totalSeedsTest,
     );
   }
 
@@ -327,6 +334,8 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
     final int days = int.parse(_contagemFinalController.text);
     final int repetitionCount = int.parse(_repeticaoController.text);
     final int loteCount = int.parse(_loteController.text);
+    final int totalSeedsPerLot =
+        int.parse(_sementesRepeticaoController.text) * repetitionCount;
 
     final List<Lot> lots = List.generate(loteCount, (index) {
       return Lot(
@@ -336,6 +345,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
           for (int i = 1; i <= days; i++)
             i: List<int>.filled(repetitionCount, 0),
         },
+        totalSeeds: totalSeedsPerLot,
       );
     });
 
@@ -367,10 +377,12 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
     await NotificationLocalService().requestExactAlarmPermission(context);
     final DateTime firstCountDate = test.calculateCountDate(test.firstCount);
 
-    await NotificationLocalService().scheduleGerminationNotification(
-      testId: test.id,
-      date: firstCountDate,
-      seedName: test.species,
-    );
+    if (test.id != null) {
+      await NotificationLocalService().scheduleGerminationNotification(
+        testId: test.id!,
+        date: firstCountDate,
+        seedName: test.species,
+      );
+    }
   }
 }

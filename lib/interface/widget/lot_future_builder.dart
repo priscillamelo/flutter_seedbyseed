@@ -29,7 +29,7 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
   void initState() {
     super.initState();
     lotRepository = LotRepository();
-    listLot = lotRepository.getAllLots(widget.germinationTest.id);
+    listLot = lotRepository.getAllLots(widget.germinationTest.id!);
     _pageViewController = PageController();
   }
 

@@ -50,7 +50,7 @@ class _FinishedTabState extends State<FinishedTab> {
                               arguments: data[index],
                             );
                           },
-                          onLongPress: () => _confirmDeleteGerminationTest(context, data[index].id),
+                          onLongPress: () => _confirmDeleteGerminationTest(context, data[index].id!),
                         );
                       },
                     ),

@@ -195,11 +195,11 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
                             // verifica se é o último dia do teste de germinação para poder realizar o cálculo do IVG do Lote e mudar o status do teste para finalizado
                             if (lastDay) {
                               widget.lot.calculateIVGPerLot();
-                              await widget.lot.totalGerminatedSeedPerLot();
+                              await widget.lot.calculateTotalGerminatedSeedPerLot();
                               await lotRepository.updateLot(widget.lot);
                               await widget.germinationTest
                                   .totalGerminatedSeedGerminationTest(
-                                      widget.germinationTest.id);
+                                      widget.germinationTest.id!);
 
                               if (widget.lastPage) {
                                 widget.germinationTest.status =
@@ -255,7 +255,6 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
   }
 
   Future<void> saveGerminationSeedsLot(List<Repetition> listRepetition) async {
-    listGerminatedSeeds;
     widget.lot.dailyCount[widget.germinationTest.currentDay] =
         listGerminatedSeeds;
     debugPrint(
@@ -268,7 +267,7 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
 
   Future<void> saveGerminationSeedsTestGermination() async {
     // Busca todos os lotes associados ao teste
-    final lots = await lotRepository.getAllLots(widget.germinationTest.id);
+    final lots = await lotRepository.getAllLots(widget.germinationTest.id!);
 
     final totalGerminatedSeeds =
         lots.fold<int>(0, (sum, lot) => sum + lot.germinatedSeedPerLot);
