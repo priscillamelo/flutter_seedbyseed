@@ -23,6 +23,9 @@ class DatabaseApp {
     final Database database = await openDatabase(
       databasePath,
       version: 1,
+      onConfigure: (db) async {
+        await db.execute('PRAGMA foreign_keys = ON');
+      },
       onCreate: (database, newerVersion) async {
         await database.execute(_sqlTableGerminationTest);
         await database.execute(_sqlTableLot);

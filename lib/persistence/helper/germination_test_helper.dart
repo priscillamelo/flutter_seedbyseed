@@ -49,13 +49,6 @@ class GerminationTestHelper {
     return listGerminationTest;
   }
 
-  /*   Future<List> getAll() async {
-    final Database database = await _databaseApp.getDatabase;
-    final List listGerminationTest = await database.query(tableName);
-
-    return listGerminationTest;
-  } */
-
   Future<int> update(GerminationTest germinationTest) async {
     final Database database = await _databaseApp.getDatabase;
     late final int numberRowsAffected;
