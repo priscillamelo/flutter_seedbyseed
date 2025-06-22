@@ -6,15 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_seedbyseed/domain/model/lot.dart'; // Certifique-se que o caminho do modelo Lot está correto
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 
 Future<void> lidarComExportacao(BuildContext context, List<Lot> lotes) async {
-  // 1. Lida com a permissão primeiro
-  final bool permissaoConcedida = await solicitarPermissao(context);
-
-  // 2. Se a permissão não for concedida, pare o processo.
-  if (!permissaoConcedida || !context.mounted) return;
-
-  // 3. Se a permissão foi concedida, gere os bytes do arquivo
   ScaffoldMessenger.of(context).showSnackBar(
     const SnackBar(content: Text("Gerando relatório, por favor aguarde...")),
   );
@@ -27,19 +21,21 @@ Future<void> lidarComExportacao(BuildContext context, List<Lot> lotes) async {
 
   final fileBytes = _gerarBytesDoExcel(lotes, mapaDePercentuais);
 
-  // 4. Salve o arquivo se os bytes foram gerados com sucesso
   if (fileBytes != null) {
-    await _salvarArquivo(fileBytes, "relatorio_germinacao.xlsx");
+    final file =
+        await salvarExcelLocalmente(fileBytes, "relatorio_germinacao.xlsx");
+    await compartilharArquivo(file);
+
     if (context.mounted) {
       ScaffoldMessenger.of(context).removeCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Relatório salvo na pasta Downloads!")),
+        const SnackBar(content: Text("Arquivo pronto para compartilhamento!")),
       );
     }
   } else {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Ocorreu um erro ao gerar o relatório.")),
+        const SnackBar(content: Text("Erro ao gerar o arquivo.")),
       );
     }
   }
@@ -193,95 +189,103 @@ Uint8List? _gerarBytesDoExcel(
   return Uint8List.fromList(excel.save()!);
 }
 
-/// Salva uma lista de bytes em um arquivo na pasta de Downloads do dispositivo.
-Future<void> _salvarArquivo(Uint8List bytes, String nomeArquivo) async {
-  try {
-    final directory = await getDownloadDirectory();
+Future<File> salvarExcelLocalmente(Uint8List bytes, String nomeArquivo) async {
+  final dir =
+      await getApplicationDocumentsDirectory(); // diretório privado do app
+  final path = '${dir.path}/$nomeArquivo';
 
-    if (directory == null) return;
-
-    final path = "${directory.path}/$nomeArquivo";
-    final file = File(path);
-
-    await file.writeAsBytes(bytes);
-    debugPrint("✅ Arquivo salvo em: $path");
-  } catch (e) {
-    debugPrint("❌ Erro ao salvar o arquivo: $e");
-  }
+  final file = File(path);
+  await file.writeAsBytes(bytes);
+  return file;
 }
 
+Future<void> compartilharArquivo(File file) async {
+  final xfile = XFile(file.path);
+  await SharePlus.instance.share(
+    ShareParams(
+      files: [xfile],
+      text: 'Relatório de Germinação',
+    ),
+  );
+}
+
+/// Salva uma lista de bytes em um arquivo na pasta de Downloads do dispositivo.
+
+/// Solicita permissão de armazenamento de forma robusta e correta.
 Future<bool> solicitarPermissao(BuildContext context) async {
   var status = await Permission.storage.status;
-  bool? permissaoConcedida = true;
-  if (status.isGranted) return permissaoConcedida;
+  debugPrint("Status inicial da permissão: $status");
 
-  if (status.isDenied) {
-    if (context.mounted) {
-      permissaoConcedida = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text("Permissão Necessária"),
-          content: const Text(
-              "Precisamos da sua permissão de armazenamento para salvar o relatório em Excel no seu dispositivo."),
-          actions: [
-            TextButton(
-              child: const Text("Cancelar"),
-              onPressed: () => Navigator.pop(context, false),
-            ),
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () async {
-                Navigator.pop(context, true);
-              },
-            ),
-          ],
-        ),
-      );
-    }
-    return permissaoConcedida ?? false;
+  // 1. Se a permissão já foi concedida, retorna 'true' e termina.
+  if (status.isGranted) {
+    return true;
   }
 
+  // 2. Se foi permanentemente negada, guia o usuário para as configurações.
   if (status.isPermanentlyDenied) {
     if (context.mounted) {
-      permissaoConcedida = await showDialog<bool>(
+      await showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text("Permissão Necessária"),
           content: const Text(
-              "A permissão de armazenamento foi negada permanentemente. Para salvar arquivos, você precisa habilitá-la manualmente nas configurações do aplicativo."),
+              "A permissão de armazenamento foi negada permanentemente. Por favor, habilite-a nas configurações do aplicativo."),
           actions: [
             TextButton(
               child: const Text("Cancelar"),
-              onPressed: () => Navigator.pop(context, false),
+              onPressed: () => Navigator.pop(context),
             ),
             TextButton(
               child: const Text("Abrir Configurações"),
               onPressed: () {
-                openAppSettings(); // Abre as configurações do app
-                Navigator.pop(context, true);
+                openAppSettings();
+                Navigator.pop(context);
               },
             ),
           ],
         ),
       );
     }
-    return permissaoConcedida ?? false;
+    return false;
   }
 
-  return permissaoConcedida;
-}
+  // 3. ESTA É A PARTE IMPORTANTE: Se a permissão foi apenas negada (ou nunca pedida).
+  if (status.isDenied) {
+    if (context.mounted) {
+      // Mostra o diálogo explicando POR QUE você precisa da permissão.
+      final bool? usuarioConcordou = await showDialog<bool>(
+        context: context,
+        barrierDismissible: false, // Opcional: impede fechar clicando fora
+        builder: (context) => AlertDialog(
+          title: const Text("Permissão Necessária"),
+          content: const Text(
+              "Para salvar o relatório em Excel, o aplicativo precisa da sua permissão para acessar o armazenamento."),
+          actions: [
+            TextButton(
+              child: const Text("Cancelar"),
+              onPressed: () => Navigator.pop(context, false), // Retorna 'false'
+            ),
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () => Navigator.pop(context, true), // Retorna 'true'
+            ),
+          ],
+        ),
+      );
 
-Future<Directory?> getDownloadDirectory() async {
-  if (Platform.isAndroid) {
-    final directory = Directory('/storage/emulated/0/Download');
-    if (await directory.exists()) {
-      return directory;
-    } else {
-      debugPrint("❌ Diretório de Downloads não encontrado.");
-      return null;
+      debugPrint("Usuário concordou? $usuarioConcordou");
+
+      // 4. Se o usuário clicou em "OK" (usuarioConcordou == true)...
+      if (usuarioConcordou == true) {
+        // ...ENTÃO, E SOMENTE ENTÃO, pedimos a permissão REAL ao sistema Android.
+        final result = await Permission.storage.request();
+        debugPrint(result.toString());
+        // O resultado final (true ou false) depende da escolha do usuário no diálogo do SISTEMA.
+        return usuarioConcordou!;
+      }
     }
-  } else if (Platform.isIOS) {
-    return await getApplicationDocumentsDirectory();
   }
-  return null;
+
+  // Se o usuário cancelou o nosso diálogo ou o status é outro, retorna false.
+  return false;
 }

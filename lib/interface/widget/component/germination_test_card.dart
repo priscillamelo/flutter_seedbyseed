@@ -40,6 +40,11 @@ class GerminationTestCard extends StatelessWidget {
     final double valueIndicatorGerminatedSeeds = (germinatedSeeds / totalSeeds);
     final double percGerminated = valueIndicatorGerminatedSeeds * 100;
 
+    debugPrint("TotalSeeds: $totalSeeds");
+    debugPrint("GerminatedSeeds: $germinatedSeeds");
+    debugPrint("Value of Indicator: $valueIndicatorGerminatedSeeds");
+    debugPrint("Percentual Germinated: $percGerminated");
+
     double heightScreen = MediaQuery.of(context).size.height * 0.14;
 
     return GestureDetector(

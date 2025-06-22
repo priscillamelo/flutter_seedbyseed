@@ -95,77 +95,87 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
 
   // Card do Lote com as novas barras de progresso
   Widget _buildLotCard(BuildContext context, Lot lot) {
-    // Exemplo fixo — substituir por valores reais depois
-    final double averageGermination =
-        (lot.totalSeeds / lot.germinatedSeedPerLot) * 100;
+    final double valueIndicatoraverageGermination =
+        (lot.germinatedSeedPerLot / lot.totalSeeds);
+    final double averageGermination = valueIndicatoraverageGermination * 100;
     final double averageIVG = lot.averageIVG;
+    final ivgChips = lot.ivgPerLot;
 
-    final germinationByRep = [
-      {"label": "R1: 87%", "value": 0.87},
-      {"label": "R2: 83%", "value": 0.83},
-      {"label": "R3: 76%", "value": 0.76},
-      {"label": "R4: 76%", "value": 0.76},
-    ];
+    return FutureBuilder<List<double>>(
+      future: lot.calculatePercGerminatedSeedsPerRepetition(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Text("Erro: ${snapshot.error}");
+        } else {
+          final percList = snapshot.data!;
+          final Map<String, double> germPerRepetition = {
+            for (int i = 0; i < percList.length; i++) "R${i + 1}": percList[i],
+          };
 
-    final ivgChips = ["R1: 1.2", "R2: 1.5", "R3: 1.6", "R4: 1.6"];
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Título do Lote e progresso geral
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Lote ${lot.numberLot}",
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+          return Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Lote ${lot.numberLot}",
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Stack(
+                        alignment: AlignmentDirectional.center,
+                        children: [
+                          Text("${averageGermination.toStringAsFixed(2)}%"),
+                          CircularProgressIndicator(
+                            constraints: const BoxConstraints(
+                                minHeight: 52, minWidth: 52),
+                            value: valueIndicatoraverageGermination,
+                            strokeWidth: 6,
+                            backgroundColor: Colors.grey.shade300,
+                            valueColor: AlwaysStoppedAnimation(
+                              Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ),
-                CircularProgressIndicator(
-                  value: averageGermination,
-                  strokeWidth: 5,
-                  backgroundColor: Colors.grey.shade300,
-                  valueColor: AlwaysStoppedAnimation(
-                    Theme.of(context).colorScheme.primary,
+                  const SizedBox(height: 16),
+                  _infoRow(
+                    icon: Amicons.lucide_gauge,
+                    label: "Média do IVG",
+                    value: averageIVG.toString(),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 24),
+                  _progressGroup(
+                    icon: Amicons.remix_percent_fill,
+                    label: "Germinação por Repetição",
+                    items: germPerRepetition,
+                  ),
+                  const SizedBox(height: 24),
+                  _chipGroup(
+                    icon: Amicons.remix_timer_fill,
+                    label: "IVG por Repetição",
+                    values: ivgChips,
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-
-            // IVG Médio
-            _infoRow(
-              icon: Amicons.lucide_gauge,
-              label: "Média do IVG",
-              value: averageIVG.toString(),
-            ),
-            const SizedBox(height: 24),
-
-            // Germinação por Repetição com barra de progresso
-            _progressGroup(
-              icon: Amicons.remix_percent_fill,
-              label: "Germinação por Repetição",
-              items: germinationByRep,
-            ),
-            const SizedBox(height: 24),
-
-            // IVG por Repetição (mantém chips)
-            _chipGroup(
-              icon: Amicons.remix_timer_fill,
-              label: "IVG por Repetição",
-              values: ivgChips,
-            ),
-          ],
-        ),
-      ),
+          );
+        }
+      },
     );
   }
 
@@ -191,7 +201,7 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
   Widget _progressGroup({
     required IconData icon,
     required String label,
-    required List<Map<String, dynamic>> items,
+    required Map<String, double> items,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,12 +222,12 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
           mainAxisSpacing: 8,
           crossAxisSpacing: 8,
           childAspectRatio: 5.5,
-          children: items
-              .map((item) => _buildProgressChip(
-                    label: item["label"],
-                    progress: item["value"],
-                  ))
-              .toList(),
+          children: items.entries.map((entry) {
+            return _buildProgressChip(
+              label: entry.key,
+              progress: entry.value,
+            );
+          }).toList(),
         ),
       ],
     );
@@ -226,7 +236,7 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
   Widget _chipGroup({
     required IconData icon,
     required String label,
-    required List<String> values,
+    required Map<String, double> values,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,9 +252,9 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
         Wrap(
           spacing: 8,
           runSpacing: 4,
-          children: values
+          children: values.entries
               .map((e) => Chip(
-                    label: Text(e),
+                    label: Text("${e.key}: ${e.value}"),
                     backgroundColor: Colors.grey.shade100,
                   ))
               .toList(),
@@ -258,6 +268,7 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
     required double progress,
     Color color = Colors.green,
   }) {
+    final double valueIndicator = progress / 100;
     return Container(
       width: 90,
       height: 32,
@@ -271,7 +282,7 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
-              value: progress,
+              value: valueIndicator,
               backgroundColor: Colors.grey.shade300,
               valueColor: AlwaysStoppedAnimation<Color>(color),
               minHeight: 32,
@@ -280,7 +291,7 @@ class _DetailsGerminationTestState extends State<DetailsGerminationTest> {
           Padding(
             padding: const EdgeInsets.only(left: 8, top: 4),
             child: Text(
-              label,
+              "$label: $progress%",
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
