@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
 import 'package:flutter_seedbyseed/infra/config/notification_local_service.dart';
 import 'package:flutter_seedbyseed/interface/screens/add_germinated_seeds.dart';
 import 'package:flutter_seedbyseed/interface/screens/add_germination_test.dart';
@@ -63,8 +64,11 @@ class MyApp extends StatelessWidget {
             const AddGerminatedSeeds(),
         PageRoutes.kDETAILS_GERMINATIONTEST: (context) =>
             const DetailsGerminationTest(),
-
-        //PageRoutes.kUPDATE_GERMINATIONTEST: (context) => const UpdateGerminationTest(),
+        PageRoutes.kUPDATE_GERMINATIONTEST: (context) {
+          final test =
+              ModalRoute.of(context)!.settings.arguments as GerminationTest;
+          return AddGerminationTest(testToEdit: test);
+        },
       },
       home: const HomePage(),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_seedbyseed/interface/widget/repetition_future_builder.dart';
 import 'package:flutter_seedbyseed/domain/model/germination_test.dart';
 import 'package:flutter_seedbyseed/domain/model/lot.dart';
+import 'package:flutter_seedbyseed/interface/widget/repetition_future_builder.dart';
 import 'package:flutter_seedbyseed/persistence/repository/lot_repository.dart';
 
 class LotFutureBuilder extends StatefulWidget {
@@ -24,6 +24,7 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
   late Future<List<Lot>> listLot;
   late final PageController _pageViewController;
   int _currentPageIndex = 0;
+  final Map<int, Future<void> Function()> _pageSaveFunctions = {};
 
   @override
   void initState() {
@@ -37,6 +38,16 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
   void dispose() {
     _pageViewController.dispose();
     super.dispose();
+  }
+
+  // NOVO HELPER: Centraliza a lógica de salvamento da página atual.
+  Future<void> _saveCurrentPage() async {
+    // Pega a função de salvar da página que estamos SAINDO.
+    final saveFunction = _pageSaveFunctions[_currentPageIndex];
+    if (saveFunction != null) {
+      // Espera o salvamento ser concluído.
+      await saveFunction();
+    }
   }
 
   @override
@@ -95,7 +106,9 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
                 children: [
                   IconButton(
                     onPressed: _currentPageIndex > 0
-                        ? () {
+                        ? () async {
+                            await _saveCurrentPage();
+
                             _pageViewController.previousPage(
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
@@ -112,7 +125,8 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
                   ),
                   IconButton(
                     onPressed: _currentPageIndex < lots.length - 1
-                        ? () {
+                        ? () async {
+                            await _saveCurrentPage();
                             _pageViewController.nextPage(
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
@@ -132,7 +146,8 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
                 child: PageView.builder(
                   itemCount: lots.length,
                   controller: _pageViewController,
-                  onPageChanged: (index) {
+                  onPageChanged: (index) async {
+                    await _saveCurrentPage();
                     setState(() => _currentPageIndex = index);
                   },
                   itemBuilder: (context, index) {
@@ -143,12 +158,20 @@ class _LotFutureBuilderState extends State<LotFutureBuilder>
                       germinationTest: widget.germinationTest,
                       lastPage: isLastPage,
                       isNewDay: widget.isNewDay,
-                      onUpdatePage: () {
-                        if (!isLastPage) {
-                          _pageViewController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
+                      onSaveReady: (saveFunction) {
+                        _pageSaveFunctions[index] = saveFunction;
+                      },
+                      // FORNECENDO A IMPLEMENTAÇÃO DOS NOVOS CALLBACKS
+                      onSaveAndGoNext: () {
+                        _pageViewController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                      onSaveAndFinish: () {
+                        // Garante que o contexto ainda é válido antes de dar pop
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
                         }
                       },
                     );

@@ -12,16 +12,21 @@ class RepetitionFutureBuilder extends StatefulWidget {
   final Lot lot;
   final GerminationTest germinationTest;
   final bool lastPage;
-  final VoidCallback onUpdatePage;
   final bool isNewDay;
+  final void Function(Future<void> Function() saveFunction) onSaveReady;
+  // NOVOS CALLBACKS PARA O BOTÃO
+  final VoidCallback onSaveAndGoNext;
+  final VoidCallback onSaveAndFinish;
 
   const RepetitionFutureBuilder({
     super.key,
     required this.lot,
     required this.lastPage,
     required this.germinationTest,
-    required this.onUpdatePage,
     required this.isNewDay,
+    required this.onSaveReady,
+    required this.onSaveAndGoNext,
+    required this.onSaveAndFinish,
   });
 
   @override
@@ -42,16 +47,185 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
   @override
   void initState() {
     super.initState();
-    repetitionRepository = RepetitionRepository();
-    listRepetition = repetitionRepository.getAllRepetition(widget.lot.id);
     firstCount = widget.germinationTest
         .calculateCountDate(widget.germinationTest.firstCount);
+    widget.onSaveReady(_saveDataSilently);
   }
 
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    repetitionRepository = RepetitionRepository();
     lotRepository = Provider.of<LotRepository>(context);
     testRepository = Provider.of<GerminationTestRepository>(context);
+
+    listRepetition = repetitionRepository.getAllRepetition(widget.lot.id);
+  }
+
+  Future<void> _finalizeIfLastDay() async {
+    final daysOfCount = widget.germinationTest.lastCount;
+    final lastDay = widget.germinationTest.currentDay == daysOfCount;
+
+    if (lastDay) {
+      widget.lot.calculateIVGPerLot();
+      await widget.lot.calculateTotalGerminatedSeedPerLot();
+      await lotRepository.updateLot(widget.lot);
+      await widget.germinationTest
+          .totalGerminatedSeedGerminationTest(widget.germinationTest.id!);
+
+      if (widget.lastPage) {
+        widget.germinationTest.status = GerminationTest.finished;
+      }
+
+      await testRepository.updateGerminationTest(widget.germinationTest);
+    }
+  }
+
+  Future<void> _saveDataSilently() async {
+    if (!hasChanges) return;
+
+    final repetitions = await listRepetition;
+
+    await saveGerminationSeedsRepetition(repetitions);
+    await saveGerminationSeedsLot(repetitions);
+    await saveGerminationSeedsTestGermination();
+    await _finalizeIfLastDay();
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Dados salvos automaticamente."),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.only(bottom: 80, left: 20, right: 20),
+        ),
+      );
+    }
+
+    setState(() {
+      hasChanges = false;
+    });
+  }
+
+  Future<void> _handleButtonPress() async {
+    if (!hasChanges) {
+      if (widget.lastPage) {
+        widget.onSaveAndFinish();
+      } else {
+        widget.onSaveAndGoNext();
+      }
+      return;
+    }
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 20),
+            Text("Salvando..."),
+          ],
+        ),
+      ),
+    );
+
+    final repetitions = await listRepetition;
+
+    await saveGerminationSeedsRepetition(repetitions);
+    await saveGerminationSeedsLot(repetitions);
+    await saveGerminationSeedsTestGermination();
+    await _finalizeIfLastDay();
+
+    if (context.mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Dados salvos com sucesso!"),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.fixed,
+        ),
+      );
+    }
+
+    setState(() {
+      hasChanges = false;
+    });
+
+    if (widget.lastPage) {
+      widget.onSaveAndFinish();
+    } else {
+      widget.onSaveAndGoNext();
+    }
+  }
+
+  /* Future<void> _saveData() async {
+    if (!hasChanges) {
+      // Se não houver mudanças, o botão simplesmente navega.
+      if (widget.lastPage) {
+        widget.onSaveAndFinish();
+      } else {
+        widget.onSaveAndGoNext();
+      }
+      return;
+    }
+
+    final repetitions = await listRepetition;
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const AlertDialog(
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 20),
+            Text("Salvando..."),
+          ],
+        ),
+      ),
+    );
+
+    await saveGerminationSeedsRepetition(repetitions);
+    await saveGerminationSeedsLot(repetitions);
+    await saveGerminationSeedsTestGermination();
+
+    if (context.mounted) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Dados salvos com sucesso!"),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.fixed,
+        ),
+      );
+    }
+
+    // Zera o estado de mudanças após salvar
+    setState(() {
+      hasChanges = false;
+    });
+
+    await _finalizeIfLastDay();
+
+    // MODIFICAÇÃO PRINCIPAL: Decide qual callback de navegação chamar.
+    if (widget.lastPage) {
+      // Se for a última página, chama o callback para finalizar e dar pop.
+      widget.onSaveAndFinish();
+    } else {
+      // Se não for, chama o callback para ir para a próxima página.
+      widget.onSaveAndGoNext();
+    }
+  } */
+
+  @override
+  Widget build(BuildContext context) {
     return FutureBuilder(
         future: listRepetition,
         builder: (context, snapshot) {
@@ -144,8 +318,8 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    onPressed: hasChanges
-                        ? () async {
+                    onPressed: hasChanges ? _handleButtonPress : null,
+                    /* () async {
                             showDialog<void>(
                               context: context,
                               barrierDismissible: false,
@@ -205,13 +379,11 @@ class _RepetitionFutureBuilderState extends State<RepetitionFutureBuilder> {
                             if (!widget.lastPage) {
                               widget.onUpdatePage();
                             } else {
-
                               if (context.mounted) {
                                 Navigator.pop(context);
                               }
                             }
-                          }
-                        : null,
+                          } */
                   ),
                 ),
                 const SizedBox(height: 16),

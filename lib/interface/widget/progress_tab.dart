@@ -95,19 +95,17 @@ class _ProgressTabState extends State<ProgressTab> {
       builder: (context) {
         return Wrap(
           children: [
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Editar teste'),
-              onTap: () {
-                Navigator.pop(context);
-                // Redirecionar para a tela de edição
-                Navigator.pushNamed(
-                  context,
-                  '/editar-teste',
-                  arguments: test,
-                );
-              },
-            ),
+            if (!test.verifyIsFirstCountAvailable())
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Editar teste'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushNamed(
+                      context, PageRoutes.kUPDATE_GERMINATIONTEST,
+                      arguments: test);
+                },
+              ),
             ListTile(
               leading: const Icon(Icons.check_circle_outline),
               title: const Text('Finalizar teste'),

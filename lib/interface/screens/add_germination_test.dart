@@ -14,7 +14,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class AddGerminationTest extends StatefulWidget {
-  const AddGerminationTest({super.key});
+  final GerminationTest? testToEdit;
+
+  const AddGerminationTest({super.key, this.testToEdit});
 
   @override
   State<AddGerminationTest> createState() => _AddGerminationTestState();
@@ -29,10 +31,13 @@ class _AddGerminationTestState extends State<AddGerminationTest> {
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.testToEdit != null;
     return Scaffold(
       appBar: AppBar(
-        title: const AutoSizeText(
-          "Cadastro de Teste de Germinação",
+        title: AutoSizeText(
+          isEditing
+              ? "Editar Teste de Germinação"
+              : "Cadastro de Teste de Germinação",
           maxLines: 1,
           minFontSize: 10,
           style: TextStyle(fontSize: 24),
@@ -52,6 +57,7 @@ class _AddGerminationTestState extends State<AddGerminationTest> {
       ),
       body: FormAddWidget(
         statusNotification: getStatusNotification(),
+        testToEdit: widget.testToEdit,
       ),
     );
   }
@@ -59,7 +65,9 @@ class _AddGerminationTestState extends State<AddGerminationTest> {
 
 class FormAddWidget extends StatefulWidget {
   final bool statusNotification;
-  const FormAddWidget({super.key, required this.statusNotification});
+  final GerminationTest? testToEdit;
+  const FormAddWidget(
+      {super.key, required this.statusNotification, this.testToEdit});
 
   @override
   State<FormAddWidget> createState() => _FormCustomWidgetState();
@@ -80,6 +88,28 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
   final _contagemFinalController = TextEditingController();
   late String materialUsed = "";
   late String substrateUsed = "";
+
+  @override
+  void initState() {
+    super.initState();
+    final test = widget.testToEdit;
+    if (test != null) {
+      _especieController.text = test.species;
+      _temperaturaController.text = test.temperature;
+      _contagemInicialController.text = test.firstCount.toString();
+      _contagemFinalController.text = test.lastCount.toString();
+      materialUsed = test.materialUsed;
+      substrateUsed = test.substratoUsed;
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    testRepository = Provider.of<GerminationTestRepository>(context);
+    lotRepository = LotRepository();
+    repetitionRepository = RepetitionRepository();
+  }
 
   Widget _buildSection(String title, List<Widget> children) {
     return Card(
@@ -103,10 +133,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
 
   @override
   Widget build(BuildContext context) {
-    testRepository = Provider.of<GerminationTestRepository>(context);
-    lotRepository = LotRepository();
-    repetitionRepository = RepetitionRepository();
-
+    final isEditing = widget.testToEdit != null;
     return SafeArea(
       child: Center(
         child: Padding(
@@ -114,10 +141,8 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
           child: Form(
             key: _formKey,
             child: SingleChildScrollView(
-              // Adicionado mais preenchimento para um respiro nas bordas
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Column(
-                  // Alinha os elementos à esquerda (padrão para preenchimento de formulário)
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildSection("Identificação", [
@@ -127,9 +152,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                         textInputType: TextInputType.text,
                         icon: Icons.eco_outlined,
                       ),
-                      // Espaçamento entre campos
                     ]),
-
                     _buildSection("Especificações", [
                       TextFormFieldComponent(
                         controller: _loteController,
@@ -143,14 +166,12 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                         textInputType: TextInputType.number,
                         icon: Icons.repeat,
                       ),
-                      // Espaçamento entre campos
                       TextFormFieldComponent(
                         controller: _sementesRepeticaoController,
                         textLabel: "Sementes por repetição",
                         textInputType: TextInputType.number,
                         icon: Icons.grain_outlined,
                       ),
-                      // Espaçamento entre campos
                       TextFormFieldComponent(
                         controller: _temperaturaController,
                         textLabel: "Temperatura (ºC)",
@@ -161,7 +182,6 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                         icon: Icons.thermostat_outlined,
                       ),
                     ]),
-
                     _buildSection("Contagens", [
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +194,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                               icon: FontAwesomeIcons.hourglassStart,
                             ),
                           ),
-                          const SizedBox(width: 16), // Espaçamento horizontal
+                          const SizedBox(width: 16),
                           Expanded(
                             child: TextFormFieldComponent(
                               controller: _contagemFinalController,
@@ -186,7 +206,6 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                         ],
                       ),
                     ]),
-
                     _buildSection("Materiais", [
                       DropdownButtonComponent(
                         typeEnum: 'Material',
@@ -205,8 +224,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                         },
                       ),
                     ]),
-
-                    const SizedBox(height: 32), // Mais espaço antes dos botões
+                    const SizedBox(height: 32),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -216,16 +234,12 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                 Navigator.pop(context);
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Colors.transparent, // Fundo transparente
-                                shadowColor: Colors.transparent, // Sem sombra
-                                // Define a cor do texto para a cor primária do tema
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
                                 foregroundColor:
                                     Theme.of(context).colorScheme.primary,
                                 side: BorderSide(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .primary, // Borda na cor primária
+                                  color: Theme.of(context).colorScheme.primary,
                                   width: 1,
                                 ),
                                 padding:
@@ -240,8 +254,7 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                               ),
                             ),
                           ),
-                          const SizedBox(
-                              width: 16), // Espaçamento entre os botões
+                          const SizedBox(width: 16),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () async {
@@ -249,13 +262,18 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                   GerminationTest germinationTest =
                                       _instantiateGerminationTest();
 
-                                  germinationTest.id = await testRepository
-                                      .addGerminationTest(germinationTest);
-
-                                  if (germinationTest.id != null) {
-                                    final listIdLot = await _instantiateLots(
-                                        germinationTest.id!);
-                                    await _instantiateRepetitions(listIdLot);
+                                  if (isEditing) {
+                                    germinationTest.id = widget.testToEdit!.id;
+                                    await testRepository
+                                        .updateGerminationTest(germinationTest);
+                                  } else {
+                                    germinationTest.id = await testRepository
+                                        .addGerminationTest(germinationTest);
+                                    if (germinationTest.id != null) {
+                                      final listIdLot = await _instantiateLots(
+                                          germinationTest.id!);
+                                      await _instantiateRepetitions(listIdLot);
+                                    }
                                   }
 
                                   if (widget.statusNotification) {
@@ -271,8 +289,9 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                             borderRadius:
                                                 BorderRadius.circular(8),
                                           ),
-                                          content: Text(
-                                              '${germinationTest.species} cadastrado!')),
+                                          content: Text(isEditing
+                                              ? '${germinationTest.species} atualizado!'
+                                              : '${germinationTest.species} cadastrado!')),
                                     );
 
                                     Navigator.pop(context);
@@ -280,18 +299,17 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
                                 }
                               },
                               style: ElevatedButton.styleFrom(
-                                // Estilo para o botão "Cadastrar Teste" - Mais proeminente
-                                // A cor de fundo será a cor primária do seu tema (Colors.blueGrey)
                                 backgroundColor:
                                     Theme.of(context).colorScheme.primary,
-                                // A cor do texto será a cor "onPrimary" do seu tema, que contrasta com a cor primária
                                 foregroundColor:
                                     Theme.of(context).colorScheme.onPrimary,
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 12),
                               ),
                               child: Text(
-                                "Cadastrar Teste",
+                                isEditing
+                                    ? "Salvar Alterações"
+                                    : "Cadastrar Teste",
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -309,7 +327,8 @@ class _FormCustomWidgetState extends State<FormAddWidget> {
   }
 
   GerminationTest _instantiateGerminationTest() {
-    final createdDate = VerifyDate.normalizeDayMonth(DateTime.now());
+    final createdDate = widget.testToEdit?.createdAt ??
+        VerifyDate.normalizeDayMonth(DateTime.now());
 
     final int repetitionCount = int.parse(_repeticaoController.text);
     final int loteCount = int.parse(_loteController.text);
